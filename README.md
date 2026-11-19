@@ -1,13 +1,20 @@
-# Corner Time Challenge Studio
+# Corner Time
 
-How still can you stay for ten seconds? Can you move away from your starting spot and find it again? Corner Time turns small movements and sounds into 40 short challenges you can play in a browser on your phone, tablet, or computer.
+Choose a timed duty, such as staying in place or observing quiet time. The app gives spoken instructions and tells you when your time is served. [Open Corner Time](https://img2vid.github.io/cornertime/).
 
-**[Open the Challenge Studio](https://img2vid.github.io/cornertime/)**
+## Serve a duty
 
-## Try your first challenge
+1. Set your device on a steady surface. Choose **Short stillness hold** for a 20-second first session. Select **Begin duty** and allow camera access. For a sound or mixed duty, also select **Enable microphone**.
+2. Settle into a comfortable position during preparation. Follow the instruction and watch the remaining time for the current hold. The camera averages changes across several small areas so a single flickering spot has less influence.
+3. When you move outside the target, the clock waits. Two consecutive missed seconds bring a spoken warning. After two good seconds, a new incident can count. Each later incident adds five seconds to the current hold, up to thirty added seconds for the whole duty. A single continuing movement earns one warning or penalty.
+4. Your served time carries forward through interruptions. Pauses and missing readings add no penalty. Use **Pause**, **Restart duty**, or **End duty** at any time. The final summary gives the time added and number of incidents.
+
+There are 40 duties across movement, position, sound and mixed supervision. Strict duties allow fewer off-target readings in each second. The optional practice mode below keeps the original streaks, retries and results.
+
+## Optional practice challenges
 
 1. Rest your phone or webcam on a steady surface with you in view. Leave it there while you play.
-2. Open the studio and choose **Steady hand**. Leave the difficulty on **Standard** and select **Start challenge**.
+2. Select **Practice challenges** and choose **Steady hand**. Leave the difficulty on **Standard** and select **Start challenge**.
 3. Allow camera access when your browser asks. Settle into position for the five-second countdown.
 4. Stay still and watch the counter. Every steady second brings you closer to ten. If you move after earning six seconds, those six still count for this challenge.
 5. Finish the hold to see your time, accuracy, and longest streak. Choose **Try again** to aim for a better result or **Back to studio** to pick another challenge.

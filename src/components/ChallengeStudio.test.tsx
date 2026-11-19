@@ -25,6 +25,7 @@ it('launches a course, waits for sensors, pauses, resumes and stores the complet
     };
     try {
         ReactDOM.render(<ChallengeStudio />, host);
+        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
         click('☆ Save'); click('Saved');
         expect(host.querySelectorAll('.cards button').length).toBe(1);
         click('Start challenge →');
@@ -56,6 +57,7 @@ it('finds all strict courses and resets a strict hold on outliers, gaps and paus
     };
     try {
         ReactDOM.render(<ChallengeStudio />, host);
+        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
         click('Strict');
         expect(host.querySelectorAll('.cards button')).toHaveLength(20);
         host.querySelector<HTMLButtonElement>('.cards button')!.click();
@@ -96,6 +98,7 @@ it('announces a loss and retries the same course and difficulty from a clean att
     };
     try {
         ReactDOM.render(<ChallengeStudio />, host);
+        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
         const level = host.querySelector('select')!;
         level.value = '1';
         level.dispatchEvent(new Event('change', {bubbles:true}));
@@ -138,6 +141,7 @@ it.each(courses.map(c => c.id))('can lose and retry %s without navigating', id =
     const click = (label: string) => Array.from(host.querySelectorAll('button')).find(b => b.textContent === label)!.click();
     try {
         ReactDOM.render(<ChallengeStudio />, host);
+        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
         click('Start challenge →');
         for (let second = 0; second < 8; second++) {
             for (let i = 0; i < 10; i++) { mockRead(miss); }
@@ -151,6 +155,32 @@ it.each(courses.map(c => c.id))('can lose and retry %s without navigating', id =
         ReactDOM.unmountComponentAtNode(host);
         document.body.removeChild(host);
         window.location.hash = '';
+        jest.useRealTimers();
+    }
+});
+
+it('serves a traditional duty with a warning and five seconds of added time', () => {
+    jest.useFakeTimers();
+    const host = document.body.appendChild(document.createElement('div'));
+    try {
+        ReactDOM.render(<ChallengeStudio />, host);
+        Array.from(host.querySelectorAll('button')).find(b => b.textContent === 'Begin duty')!.click();
+        const tick = (motion: number) => {
+            for (let n=0;n<10;n++) { mockRead({motion}); }
+            jest.advanceTimersByTime(1000);
+        };
+        for(let n=0;n<5;n++) { tick(0); }
+        tick(1); tick(1);
+        expect(host.textContent).toContain('Warning issued');
+        tick(0); tick(0); tick(1); tick(1);
+        expect(host.textContent).toContain('Five seconds added');
+        expect(host.querySelector('.digits')!.textContent).toBe('0:23');
+        for(let n=0;n<23;n++) { tick(0); }
+        expect(host.textContent).toContain('SESSION COMPLETE');
+        expect(host.textContent).toContain('5sTime added');
+    } finally {
+        ReactDOM.unmountComponentAtNode(host);
+        host.remove();
         jest.useRealTimers();
     }
 });

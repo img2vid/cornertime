@@ -1,5 +1,5 @@
 export interface Settings {
-    // Fraction of changed pixels in the most active 6-by-6 camera tile.
+    // Fraction of changed pixels in the four most active 6-by-6 camera tiles, averaged.
     threshold: number;
     name: string;
     preparationSeconds: number;
@@ -8,7 +8,7 @@ export interface Settings {
 
 const defaultSettings: Settings = {
     name: 'Anonymous',
-    threshold: 0.15,
+    threshold: 0.20,
     preparationSeconds: 10,
     cooldownSeconds: 5,
 };

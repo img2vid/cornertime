@@ -17,7 +17,8 @@ export function compareFrames(frame: Uint8Array, reference: Uint8Array) {
         exposure += frame[i] - reference[i];
     }
     exposure /= frame.length;
-    let peak = 0;
+    // Average the four most active tiles so a single noisy patch carries less weight.
+    const strongest = [0, 0, 0, 0];
     let changedTiles = 0;
     for (let y = 0; y < height; y += tile) {
         for (let x = 0; x < width; x += tile) {
@@ -25,19 +26,22 @@ export function compareFrames(frame: Uint8Array, reference: Uint8Array) {
             for (let dy = 0; dy < tile; dy++) {
                 for (let dx = 0; dx < tile; dx++) {
                     const i = (y + dy) * width + x + dx;
-                    if (Math.abs(frame[i] - reference[i] - exposure) > 12) {
+                    if (Math.abs(frame[i] - reference[i] - exposure) > 20) {
                         changed++;
                     }
                 }
             }
             const fraction = changed / (tile * tile);
-            peak = Math.max(peak, fraction);
+            if (fraction > strongest[0]) {
+                strongest[0] = fraction;
+                strongest.sort((a, b) => a - b);
+            }
             if (fraction >= 0.3) {
                 changedTiles++;
             }
         }
     }
-    return { peak, changedTiles, shifted: changedTiles >= 3 };
+    return { peak: strongest.reduce((sum, value) => sum + value, 0) / strongest.length, changedTiles, shifted: changedTiles >= 6 };
 }
 
 export function decibels(samples: Uint8Array) {

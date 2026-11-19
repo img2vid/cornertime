@@ -64,16 +64,16 @@ export function evaluate(rule: Rule, r: Reading): boolean | undefined {
 }
 
 // Undefined denotes a sensor gap, which does not count as a scored second.
-export function scoreSecond(course: Challenge, rule: Rule, batch: Reading[]): boolean | undefined {
+export function scoreSecond(course: Challenge, rule: Rule, batch: Reading[], traditional = false): boolean | undefined {
     const checks = batch.map(r => evaluate(rule, r));
     const valid = checks.filter(v => v !== undefined);
-    if (course.strict) {
+    if (course.strict && !traditional) {
         if (valid.length < 8 || valid.length !== batch.length) { return undefined; }
         return valid.every(Boolean);
     }
     if (valid.length < 5) { return undefined; }
     const hits = valid.filter(Boolean).length;
-    return rule === 'move' ? hits > 0 : hits >= Math.ceil(.8 * valid.length);
+    return rule === 'move' ? hits > 0 : hits >= Math.ceil((course.strict ? .9 : .8) * valid.length);
 }
 
 export interface Run { stage: number; progress: number; elapsed: number; hits: number; combo: number; bestCombo: number; }
