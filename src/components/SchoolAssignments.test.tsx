@@ -2,55 +2,63 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Simulate } from 'react-dom/test-utils';
 import SchoolAssignments from './SchoolAssignments';
-import { schoolTasks } from '../school';
+import { canEnter, fresh, promptFor, quota, schoolTasks, updateRound } from '../school';
 
-it.each(schoolTasks.map(t=>t.id))('completes school assignment %s, restores it and permits a fresh attempt', id => {
+it.each(schoolTasks.map(t=>t.id))('requires time and device work for every round of %s', id => {
+    const t = schoolTasks.find(item=>item.id===id)!;
+    expect(t.minutes).toBeGreaterThanOrEqual(30);
+    expect(t.minutes).toBeLessThanOrEqual(180);
+    let w = fresh();
+    for(let i=0;i<t.minutes;i++) {
+        expect(updateRound(t,{...w,entered:quota(t),elapsed:59}).rounds).toBe(i);
+        w.elapsed=60;
+        expect(updateRound(t,w).rounds).toBe(i);
+        for(let entry=0;entry<quota(t);entry++){
+            expect(canEnter(t,w)).toBe(true);
+            expect(promptFor(t,w).length).toBeGreaterThan(0);
+            w.entered++;
+        }
+        w=updateRound(t,w);
+    }
+    expect(w.rounds).toBe(t.minutes);
+    expect(canEnter(t,w)).toBe(false);
+});
+
+it('opens check-ins at 50 seconds and numbers ledger entries across rounds',()=>{
+    expect(new Set(schoolTasks.map(t=>t.id)).size).toBe(36);
+    const check=schoolTasks.find(t=>t.style==='check')!;
+    expect(canEnter(check,{...fresh(),elapsed:49})).toBe(false);
+    expect(canEnter(check,{...fresh(),elapsed:50})).toBe(true);
+    const ledger=schoolTasks.find(t=>t.style==='register')!;
+    expect(promptFor(ledger,{...fresh(),rounds:1,entered:1})).toContain('004.');
+});
+
+it('rejects wrong lines, waits for the minute, resumes a draft and allows repeating a finished duty',()=>{
     jest.useFakeTimers();
     localStorage.clear();
-    const task = schoolTasks.find(t=>t.id === id)!;
-    const host = document.body.appendChild(document.createElement('div'));
-    const click = (label:string) => {
-        const button = Array.from(host.querySelectorAll('button')).find(b=>b.textContent === label)!;
-        expect(button.disabled).toBe(false);
-        button.click();
-    };
-    const open = () => (Array.from(host.querySelectorAll('.cards button')).find(b=>b.querySelector('strong')!.textContent===task.name) as HTMLButtonElement).click();
+    const host=document.body.appendChild(document.createElement('div'));
+    const render=()=>ReactDOM.render(<SchoolAssignments />,host);
+    const button=(label:string)=>Array.from(host.querySelectorAll('button')).find(b=>b.textContent===label)!;
+    const open=()=>host.querySelector<HTMLButtonElement>('.cards button')!.click();
+    const field=()=>host.querySelector<HTMLInputElement>('#school-answer')!;
+    const type=(value:string)=>{field().value=value;Simulate.change(field());};
     try {
-        ReactDOM.render(<SchoolAssignments />,host);
-        expect(host.querySelectorAll('.cards button')).toHaveLength(36);
-        open();
-        task.steps.forEach((step,i)=>{
-            const next = i+1 === task.steps.length ? 'Finish assignment' : 'Complete step';
-            if (step.kind === 'write' || step.kind === 'answer') {
-                click(next);
-                expect(host.querySelector('[role=status]')!.textContent).not.toBe('');
-                const field = host.querySelector('textarea')!;
-                field.value = step.kind === 'write' ? Array(step.words).fill('word').join(' ') : step.answers[0];
-                Simulate.change(field);
-            } else if (step.kind === 'confirm') {
-                host.querySelector('input[type=checkbox]')!.dispatchEvent(new MouseEvent('click',{bubbles:true}));
-            } else {
-                click('Start timer');
-                jest.advanceTimersByTime(1000);
-                click('Pause timer');
-                const time = host.querySelector('.digits')!.textContent;
-                jest.advanceTimersByTime(2000);
-                expect(host.querySelector('.digits')!.textContent).toBe(time);
-                click('Resume timer');
-                jest.advanceTimersByTime((step.seconds-1)*1000);
-            }
-            click(next);
-        });
-        expect(host.textContent).toContain('Assignment complete');
+        render();open();button('Begin duty').click();
+        type('incorrect');Simulate.submit(host.querySelector('form')!);
+        expect(host.textContent).toContain('Try again.');
+        for(let i=0;i<3;i++){type(schoolTasks[0].prompts[0]);Simulate.submit(host.querySelector('form')!);}
+        jest.advanceTimersByTime(59000);
+        expect(host.textContent).toContain('Round 1 of 30');
+        button('Pause').click();jest.advanceTimersByTime(60000);
+        expect(host.textContent).toContain('Round 1 of 30');
+        button('Resume duty').click();jest.advanceTimersByTime(1000);
+        expect(host.textContent).toContain('Round 2 of 30');
+        type('I will');ReactDOM.unmountComponentAtNode(host);render();open();
+        expect(field().value).toBe('I will');expect(field().disabled).toBe(true);
         ReactDOM.unmountComponentAtNode(host);
-        ReactDOM.render(<SchoolAssignments />,host);
-        open();
+        localStorage.setItem('ct.school-device-duties-v1',JSON.stringify({[schoolTasks[0].id]:{...fresh(),rounds:29,elapsed:59,entered:3}}));
+        render();open();button('Resume duty').click();jest.advanceTimersByTime(1000);
         expect(host.textContent).toContain('Assignment complete');
-        click('Do this assignment again');
-        expect(host.textContent).toContain('Step 1 of');
-    } finally {
-        ReactDOM.unmountComponentAtNode(host);
-        host.remove();
-        jest.useRealTimers();
-    }
+        button('Do this assignment again').click();expect(host.textContent).toContain('Round 1 of 30');
+    } finally {ReactDOM.unmountComponentAtNode(host);host.remove();jest.useRealTimers();}
 });

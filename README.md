@@ -4,9 +4,11 @@ Choose a timed duty, such as staying in place or observing quiet time. The app g
 
 ## School penalties beyond corner time
 
-[Open **School penalties**](https://img2vid.github.io/cornertime/#school) for 36 assignments in six groups: written work, corrections, extra exercises, reflection, classroom service and study periods. Try assigned lines, a fraction sheet, a private reflection, bookshelf duty or a 30-minute seated study detention. Each assignment has its own instructions and ends when you complete its steps.
+[Open **School penalties**](https://img2vid.github.io/cornertime/#school) to choose from 36 duties you can do entirely on your phone, tablet or computer. Choose assigned lines, alternating lines, numbered entries, exact copies, ordered taps or timed acknowledgements. Each group offers **30, 45, 60, 90, 120 and 180 minutes**. The duration appears on the card before you begin.
 
-Type an answer to have it checked, review your own written response, or tick a practical task after doing it in person. Study timers have a pause button and pause automatically when the page is hidden. These assignments use no camera or microphone. Your draft, timer progress and completed responses are kept in this browser. Reopen an assignment to resume or review it. After finishing, **Do this assignment again** starts a fresh copy.
+Select **Begin duty**. Each round requires a full minute on the duty screen and the entries shown. For example, Assigned lines requires three correct copies per minute for 30 minutes (90 copies altogether). If you finish typing early, wait for the next round. If time runs out first, you can finish the current entry without losing progress. Timed acknowledgements open in the final ten seconds of each minute.
+
+Use **Pause** for a break. Leaving or hiding the tab pauses the timer. Your saved round, time and draft are available when you return on the same browser and device. You can repeat a completed duty. Earlier worksheet responses are available in the read-only archive if this browser has them.
 
 ## Serve a duty
 

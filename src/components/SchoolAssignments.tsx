@@ -1,103 +1,94 @@
 import * as React from 'react';
-import { Assignment, accepts, schoolTasks } from '../school';
+import { Assignment, canEnter, fresh, promptFor, quota, schoolTasks, updateRound, Work } from '../school';
 import { readLocal, saveLocal } from '../challenges';
-import { formatDuration } from '../time';
+import { durationLabel, formatDuration } from '../time';
 
-interface Work { answers: string[]; draft: string; checked: boolean; elapsed: number; }
-const fresh = (): Work => ({answers:[], draft:'', checked:false, elapsed:0});
 const groups = ['All', ...Array.from(new Set(schoolTasks.map(t => t.group)))];
+const storageKey = 'school-device-duties-v1';
 
 export default class SchoolAssignments extends React.Component {
     state = { selected: null as Assignment | null, work:fresh(), running:false, feedback:'',
-        group:'All', search:'', records:readLocal<{[id:string]: Work}>('school-work',{}) };
+        group:'All', search:'', records:readLocal<{[id:string]:Work}>(storageKey,{}) };
+    private archived = readLocal<{[id:string]:{answers:string[];draft:string}}>('school-work',{});
     private heading = React.createRef<HTMLHeadingElement>();
-    private focusHeading = () => { if (this.heading.current) { this.heading.current.focus(); } }
-    private timer = 0;
+    private input = React.createRef<HTMLInputElement>();
+    private tick = 0;
     componentDidMount() { document.addEventListener('visibilitychange',this.visibility); }
-    componentWillUnmount() { this.stop(); document.removeEventListener('visibilitychange',this.visibility); }
-    private stop() { window.clearInterval(this.timer); }
-    private visibility = () => { if (document.hidden && this.state.running) { this.pause(); } }
-    private pause = () => { this.stop(); this.setState({running:false}); }
-    private save(work: Work, feedback = '') {
-        const selected = this.state.selected;
-        if (!selected) { return; }
-        const records = { ...this.state.records, [selected.id]:work };
-        saveLocal('school-work',records);
-        this.setState({work,records,feedback});
+    componentWillUnmount() { window.clearInterval(this.tick); document.removeEventListener('visibilitychange',this.visibility); }
+    private visibility = () => { if (document.hidden) { this.pause(); } }
+    private pause = () => { window.clearInterval(this.tick); this.setState({running:false}); }
+    private open = (selected:Assignment) => {
+        this.pause();
+        const records = readLocal(storageKey,this.state.records);
+        this.setState({selected,records,work:records[selected.id] || fresh(),feedback:''},this.focusHeading);
     }
-    private open = (selected: Assignment) => {
-        this.stop();
-        this.setState({selected,work:this.state.records[selected.id] || fresh(),running:false,feedback:''},this.focusHeading);
+    private focusHeading = () => { if (this.heading.current) { this.heading.current.focus(); } }
+    private save(work:Work) {
+        const t = this.state.selected;
+        if (!t) { return; }
+        const next = updateRound(t,work);
+        const records = {...readLocal(storageKey,this.state.records),[t.id]:next};
+        saveLocal(storageKey,records);
+        this.setState({work:next,records});
+        if (next.rounds === t.minutes) { this.pause(); }
     }
-    private startTimer = (limit: number) => {
-        this.stop();
-        this.setState({running:true});
-        this.timer = window.setInterval(() => {
+    private start = () => {
+        window.clearInterval(this.tick);
+        this.setState({running:true,feedback:''},this.focusInput);
+        this.tick = window.setInterval(()=>{
             if (document.hidden) { this.pause(); return; }
-            const elapsed = Math.min(limit,this.state.work.elapsed + 1);
-            this.save({...this.state.work,elapsed});
-            if (elapsed >= limit) { this.pause(); }
+            const w = this.state.work;
+            if (w.elapsed < 60) { this.save({...w,elapsed:w.elapsed+1}); }
         },1000);
     }
-    private advance = () => {
-        const {selected,work} = this.state;
-        if (!selected) { return; }
-        const step = selected.steps[work.answers.length];
-        if (!step) { return; }
-        if (!accepts(step,work.draft,work.checked,work.elapsed)) {
-            this.setState({feedback: step.kind === 'answer' ? 'Check your answer and try again. Match any capitals and punctuation.' :
-                step.kind === 'write' ? 'Add more detail to reach the word minimum.' : 'Finish this step first.'});
-            return;
-        }
-        this.stop();
-        const response = step.kind === 'confirm' ? 'Confirmed by you' : step.kind === 'timer' ? formatDuration(work.elapsed) + ' served' : work.draft.trim();
-        this.save({...fresh(),answers:[...work.answers,response]});
-        this.setState({running:false});
-    }
-    private back = () => {
-        this.stop();
-        this.setState({selected:null,running:false,feedback:''},this.focusHeading);
+    private focusInput = () => { if (this.input.current) { this.input.current.focus(); } }
+    private submit(value:string) {
+        const {selected:t,work:w,running} = this.state;
+        if (!t || !running || !canEnter(t,w)) { return; }
+        if (value !== promptFor(t,w)) { this.setState({feedback:'Try again. Match the displayed prompt exactly.'},this.focusInput); return; }
+        this.save({...w,entered:w.entered+1,draft:''});
+        this.setState({feedback:''},this.focusInput);
     }
     render() {
-        const {selected,work,records,group,search,running,feedback} = this.state;
-        const step = selected && selected.steps[work.answers.length];
-        const matching = schoolTasks.filter(t => (group === 'All' || t.group === group) &&
-            t.name.toLowerCase().includes(search.trim().toLowerCase()));
-        return <main className="studio school"><header className="mast"><div className="wordmark">Corner Time</div>
-            <a href="#studio">Return to studio</a></header>
-            {selected ? <><div className="studio-title"><h1 ref={this.heading} tabIndex={-1}>{selected.name}</h1><button onClick={this.back}>All school penalties</button></div>
-                <section className="feature"><small>{selected.group.toUpperCase()}</small>
-                {step ? <><h2>Step {work.answers.length + 1} of {selected.steps.length}</h2><p id="school-prompt">{step.prompt}</p>
-                    {step.kind === 'confirm' && <label><input type="checkbox" checked={work.checked}
-                        onChange={e=>this.save({...work,checked:e.target.checked})}/> I completed this task in person.</label>}
-                    {(step.kind === 'answer' || step.kind === 'write') && <>
-                        <label htmlFor="school-answer">{step.kind === 'answer' ? 'Your answer' : 'Your written response'}</label>
-                        <textarea id="school-answer" aria-describedby="school-prompt" rows={step.kind === 'write' ? 4 : 2} value={work.draft}
-                            onChange={e=>this.save({...work,draft:e.target.value})}/>
-                        {step.kind === 'write' && <p>{work.draft.trim() ? work.draft.trim().split(/\s+/).length : 0} words · minimum {step.words}. Review your own response.</p>}</>}
-                    {step.kind === 'timer' && <><div className="digits">{formatDuration(step.seconds-work.elapsed)}</div>
-                        <p>The timer pauses when you leave this page or hide the tab.</p>
-                        {work.elapsed < step.seconds && <button onClick={running ? this.pause : () => this.startTimer(step.seconds)}>
-                            {running ? 'Pause timer' : work.elapsed ? 'Resume timer' : 'Start timer'}</button>}</>}
-                    <p role="status">{feedback}</p>
-                    <button className="action" disabled={(step.kind === 'timer' && work.elapsed < step.seconds) || (step.kind === 'confirm' && !work.checked)}
-                        onClick={this.advance}>{work.answers.length + 1 === selected.steps.length ? 'Finish assignment' : 'Complete step'}</button>
-                </> : <><h2>Assignment complete</h2><p>You completed all {selected.steps.length} steps.</p>
-                    <button className="action" onClick={()=>this.save(fresh())}>Do this assignment again</button></>}
-                </section>
-                {work.answers.length > 0 && <details className="stage-list"><summary>Review completed work ({work.answers.length})</summary>
-                    <ol>{work.answers.map((response,i)=><li key={i}><strong>{selected.steps[i].prompt}</strong><p>{response}</p></li>)}</ol></details>}
-                <p className="my-3">Your progress and written responses are saved in this browser on this device.</p>
-            </> : <><div className="studio-title"><h1 ref={this.heading} tabIndex={-1}>School penalties</h1><input type="search" aria-label="Search assignments"
-                placeholder="Search assignments" value={search} onChange={e=>this.setState({search:e.target.value})}/></div>
-                <p>Choose from {schoolTasks.length} assignments. Complete written work here, serve a study timer, or follow a checklist for a classroom duty. You can leave and resume later.</p>
-                <div className="filters">{groups.map(g=><button key={g} aria-pressed={group === g} onClick={()=>this.setState({group:g})}>{g}</button>)}</div>
-                <div className="cards">{matching.map(t=>{
-                    const saved = records[t.id];
-                    const progress = saved ? saved.answers.length : 0;
-                    return <button key={t.id} onClick={()=>this.open(t)}><span><strong>{t.name}</strong><small>{t.group} · {progress === t.steps.length ?
-                        'Complete' : saved ? 'Resume · ' + progress + '/' + t.steps.length : t.steps.length + ' steps'}</small></span></button>;
-                })}</div>{!matching.length && <p>No matching assignments.</p>}</>}
+        const {selected:t,work:w,records,group,search,running,feedback} = this.state;
+        const matching = schoolTasks.filter(item=>(group === 'All' || item.group === group) && item.name.toLowerCase().includes(search.trim().toLowerCase()));
+        const allowed = !!t && running && canEnter(t,w);
+        return <main className="studio school"><header className="mast"><div className="wordmark">Corner Time</div><a href="#studio">Return to studio</a></header>
+            {t ? <><div className="studio-title"><h1 ref={this.heading} tabIndex={-1}>{t.name}</h1>
+                <button onClick={()=>{this.pause();this.setState({selected:null,feedback:''},this.focusHeading);}}>All school penalties</button></div>
+                <section className="feature"><small>{t.group.toUpperCase()} · {durationLabel(t.minutes*60)} minimum</small>
+                {w.rounds === t.minutes ? <><h2>Assignment complete</h2><p>All {t.minutes} timed rounds are served.</p>
+                    <button onClick={()=>this.save(fresh())}>Do this assignment again</button></> :
+                <><h2>Round {w.rounds+1} of {t.minutes}</h2><p>{t.instructions}</p>
+                    <div className="numbers"><span><b>{formatDuration((t.minutes-w.rounds)*60-w.elapsed)}</b>Duty time remaining</span>
+                    <span><b>{60-w.elapsed}s</b>Round time remaining</span><span><b>{w.entered} / {quota(t)}</b>Entries this round</span></div>
+                    <button onClick={running ? this.pause : this.start}>{running ? 'Pause' : w.rounds || w.elapsed || w.entered ? 'Resume duty' : 'Begin duty'}</button>
+                    {w.entered === quota(t) ? <p className="my-3">Entries accepted. The next round opens when this minute ends.</p> :
+                    <><p className="my-3" id="school-prompt"><strong>{t.style === 'sequence' ? 'Tap' : 'Copy'} · {promptFor(t,w)}</strong></p>
+                    {t.style === 'sequence' ? <><p>Order: {t.prompts.join(' → ')}</p>
+                        {Array.from(new Set(t.prompts)).map(word=><button key={word} className={word === promptFor(t,w) ? 'action' : undefined} disabled={!allowed}
+                            onClick={()=>this.submit(word)}>{word}</button>)}</> :
+                        <form onSubmit={e=>{e.preventDefault();this.submit(w.draft);}}>
+                            <label htmlFor="school-answer">Your entry</label><input id="school-answer" ref={this.input}
+                                aria-describedby="school-prompt" disabled={!allowed} autoCapitalize="off" autoComplete="off" spellCheck={false}
+                                value={w.draft} onChange={e=>{this.save({...w,draft:e.target.value});this.setState({feedback:''});}}/>
+                            <button className="action" disabled={!allowed}>Submit entry</button></form>}
+                    {t.style === 'check' && w.elapsed < 50 && <p>Entry opens in {50-w.elapsed} seconds.</p>}</>}
+                    {w.elapsed === 60 && <p>Minute served. Complete the remaining entries to move on.</p>}<p role="status">{feedback}</p></>}
+                </section><p className="my-3">Progress saves on this device. Leaving the duty or hiding the tab pauses the timer.</p></> :
+                <><div className="studio-title"><h1 ref={this.heading} tabIndex={-1}>School penalties</h1>
+                    <input type="search" aria-label="Search assignments" placeholder="Search assignments" value={search} onChange={e=>this.setState({search:e.target.value})}/></div>
+                <p>Choose one of 36 on-screen duties, from 30 minutes to 3 hours. Each round requires one minute and the displayed entries. You can pause and resume later.</p>
+                <div className="filters">{groups.map(g=><button key={g} aria-pressed={group===g} onClick={()=>this.setState({group:g})}>{g}</button>)}</div>
+                <div className="cards">{matching.map(item=>{
+                    const saved = records[item.id];
+                    return <button key={item.id} onClick={()=>this.open(item)}><span><strong>{item.name}</strong>
+                        <small>{item.group} · {durationLabel(item.minutes*60)}{saved ? saved.rounds===item.minutes ? ' · Complete' : ' · Resume' : ''}</small></span></button>;
+                })}</div>{!matching.length && <p>No matching assignments.</p>}
+                {Object.keys(this.archived).length > 0 && <details className="stage-list"><summary>Archived work from earlier assignments</summary>
+                    {Object.keys(this.archived).map(id=><section key={id}><h3>{id.replace(/-/g,' ')}</h3>
+                        <ol>{this.archived[id].answers.map((text,i)=><li key={i}>{text}</li>)}</ol>
+                        {this.archived[id].draft && <p>Draft: {this.archived[id].draft}</p>}</section>)}</details>}</>}
         </main>;
     }
 }
