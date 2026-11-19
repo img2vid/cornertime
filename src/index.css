@@ -80,3 +80,7 @@ section[aria-label="Session monitoring"],.jumbotron { border:1px solid var(--edg
 .school .feature input[type=checkbox] {min-height:0;width:20px;height:20px;flex:none}
 .school .feature button:disabled {opacity:.6;cursor:default}
 .school .stage-list li p {white-space:pre-wrap;overflow-wrap:anywhere}
+.classic-duration {display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:12px 0}
+.classic-duration label {display:grid;gap:4px;margin:0}.classic-duration input{width:8em}
+.typing-cue {font-size:1.4rem;white-space:pre-wrap;overflow-wrap:anywhere}.continuous-entry{width:100%;max-width:36rem}
+.feature select,.feature input {max-width:100%}

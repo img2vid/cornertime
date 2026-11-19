@@ -65,9 +65,9 @@ export default class PunishmentStateMachine {
 
     // BEGIN STATE TRANSITION METHODS
 
-    getReady() {
+    getReady(runClock = true) {
         this.transition(['waiting'], 'preparation', 'getReady');
-        this.startClock();
+        if (runClock) { this.startClock(); }
     }
 
     start() {

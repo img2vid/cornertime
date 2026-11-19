@@ -78,6 +78,7 @@ export default class SchoolAssignments extends React.Component {
                 </section><p className="my-3">Progress saves on this device. Leaving the duty or hiding the tab pauses the timer.</p></> :
                 <><div className="studio-title"><h1 ref={this.heading} tabIndex={-1}>School penalties</h1>
                     <input type="search" aria-label="Search assignments" placeholder="Search assignments" value={search} onChange={e=>this.setState({search:e.target.value})}/></div>
+                <p><a href="#continuous">Open continuous typing penalties</a> · <a href="#chain">Open chain challenges</a></p>
                 <p>Choose one of 36 on-screen duties, from 30 minutes to 3 hours. Each round requires one minute and the displayed entries. You can pause and resume later.</p>
                 <div className="filters">{groups.map(g=><button key={g} aria-pressed={group===g} onClick={()=>this.setState({group:g})}>{g}</button>)}</div>
                 <div className="cards">{matching.map(item=>{

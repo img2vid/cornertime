@@ -12,6 +12,7 @@ export class BrowserSpeech implements Speech {
 
     speak(phrase: string, context: object) {
         // TODO render template
+        if (typeof SpeechSynthesisUtterance === 'undefined' || !window.speechSynthesis) { return; }
         const utter = new SpeechSynthesisUtterance(phrase);
         speechSynthesis.speak(utter);
     }

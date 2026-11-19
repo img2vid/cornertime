@@ -10,6 +10,14 @@ Select **Begin duty**. Each round requires a full minute on the duty screen and 
 
 Use **Pause** for a break. Leaving or hiding the tab pauses the timer. Your saved round, time and draft are available when you return on the same browser and device. You can repeat a completed duty. Earlier worksheet responses are available in the read-only archive if this browser has them.
 
+## Continuous typing and chain challenges
+
+[Continuous typing](https://img2vid.github.io/cornertime/#continuous) has 12 duties, including numbered registers, alternating lines, punctuation, reversed word order and case changes. Choose 30 minutes to 3 hours for a standalone duty. Type the next correct character to earn the time since your previous correct keystroke, up to five seconds apart. Longer gaps, pasted text and retyping deleted characters earn no time. Lines advance automatically. When the timer reaches zero, finish the current line. The 36 minute-round school penalties remain available separately.
+
+In [Chain challenge](https://img2vid.github.io/cornertime/#chain), choose a preset and generate the plan before you start. Each combination begins with a randomly timed Classic corner-time session with the usual movement monitoring and warnings, followed by a shuffled selection of distinct continuous typing penalties. Each stage starts automatically when the previous one finishes. Presets 1 through 10 assign 1 through 10 hours and default to 3, 6, 9, through 30 combinations. You can enter any count from 3 to 30 while keeping the preset time budget. Later presets allow more typing duties per combination. Chain typing duties use the duration shown in the plan.
+
+Preset 1 assigns exactly one hour, including Classic preparation. Actual completion may take longer due to movement penalties, idle time, corrections, and breaks. Pausing or leaving saves the assigned order and your place in this browser. Return to the same mode and choose **Begin or resume**.
+
 ## Serve a duty
 
 1. Set your device on a steady surface. Choose **Short stillness hold** for a 30-minute first session. Select **Begin duty** and allow camera access. For a sound or mixed duty, also select **Enable microphone**.
@@ -65,7 +73,7 @@ Your camera picture and microphone sound are processed on your device. The brows
 
 ## Use the classic timer
 
-Open **Classic tools** for a longer session with spoken instructions. The default timer starts with a duration between 10 and 15 minutes. Movement can trigger a warning or add time. The position and noise readings are for your information in this mode.
+Open **Classic tools** for a longer session with spoken instructions. On the main screen choose **Fixed duration** and type minutes, or **Random duration** and enter a starting and ending number of minutes. Both endpoints are included. Select **Start Classic session**. A separate button starts the original 10–15 minute session. Movement can trigger a warning or add time. The position and noise readings are for your information in this mode.
 
 Choose **Design preset** to set your own times and spoken phrases. A preset is a set of session instructions you can reuse. To use one someone has shared, choose **Import preset** and paste the whole preset, including its first and last lines. At the end of a classic session, you can copy its report. Choose **View report** to read a report you saved or received.
 

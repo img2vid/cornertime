@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PunishmentStateMachine from '../state';
 import SessionMonitor from './SessionMonitor';
+import TypingSession from './TypingSession';
 import SchoolAssignments from './SchoolAssignments';
 import WelcomeScreen from './WelcomeScreen';
 import PunishmentSetup from './PunishmentSetup';
@@ -12,7 +13,16 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { formatDuration } from '../time';
 
 
-type SetupScreen = 'default' | 'custom' | 'report' | 'preset' | 'school';
+type SetupScreen = 'default' | 'custom' | 'report' | 'preset' | 'school' | 'continuous' | 'chain';
+
+function linkedScreen(): SetupScreen {
+    switch(window.location.hash) {
+        case '#school': return 'school';
+        case '#continuous': return 'continuous';
+        case '#chain': return 'chain';
+        default: return 'default';
+    }
+}
 
 interface AppState {
     setupScreen: SetupScreen;
@@ -23,13 +33,13 @@ class App extends React.Component<{}, AppState> {
     fsm = new PunishmentStateMachine();
 
     state: AppState = {
-        setupScreen: window.location.hash === '#school' ? 'school' : 'default',
+        setupScreen: linkedScreen(),
     };
 
     schoolRoute = () => {
         if (this.fsm.state !== 'waiting') { return; }
-        if (window.location.hash === '#school') { this.setState({setupScreen:'school'}); }
-        else if (this.state.setupScreen === 'school') { this.returnToWelcomeScreen(); }
+        const screen=linkedScreen();
+        if(screen!=='default' || ['continuous','school','chain'].includes(this.state.setupScreen)){ this.setState({setupScreen:screen}); }
     }
 
     componentDidMount() {
@@ -56,6 +66,8 @@ class App extends React.Component<{}, AppState> {
         switch (fsm.state) {
             case 'waiting':
                 switch (this.state.setupScreen) {
+                    case 'chain': case 'continuous':
+                        return <TypingSession key={this.state.setupScreen} chain={this.state.setupScreen === 'chain'} />;
                     case 'school':
                         return <SchoolAssignments />;
                     case 'custom':
