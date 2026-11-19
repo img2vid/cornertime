@@ -1,0 +1,76 @@
+:root { --ink:#182926; --muted:#506561; --paper:#f6f7f1; --edge:#d3dcd2; --pine:#113d36; --lime:#d6ee8e; }
+* { box-sizing:border-box }
+body { margin:0; color:var(--ink); background:var(--paper); font-family:"DM Sans",system-ui,sans-serif; }
+button, input, select { font:inherit }
+.studio { max-width:1120px; padding:0 clamp(16px,4vw,52px) 40px; margin:auto }
+.mast,.studio-title,.detail-strip,.classic-actions,.launch,.filters,footer { display:flex; align-items:center; gap:12px; flex-wrap:wrap }
+.mast,.studio-title,footer { justify-content:space-between }
+.mast { padding:23px 0; border-bottom:1px solid var(--edge) }
+.wordmark { display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.04em; font-size:1.35rem }
+.wordmark i { font: bold 1.7rem/1 system-ui; border-radius:10px; background:var(--pine); color:var(--lime); padding:5px 9px }
+.mast a,footer a { color:var(--pine); text-decoration:underline; text-underline-offset:4px }
+.studio-title { margin:30px 0 15px }
+h1,h2 { letter-spacing:-.05em; font-weight:700 }
+.studio-title h1 { font-size:clamp(2rem,5vw,3.5rem); margin:0 }
+.studio h2 { font-size:1.65rem; margin:0 }
+.studio button,.studio select,.studio input { border:1px solid #bfcfc5; border-radius:9px; padding:8px 13px; background:#fff; color:var(--ink); line-height:1.45 }
+.studio button { cursor:pointer; font-weight:600 }
+.studio button:hover { border-color:#517a69; background:#edf3e6 }
+.studio :focus-visible,.container :focus-visible { outline:3px solid #cf852f; outline-offset:3px }
+.feature { border-radius:20px; padding:clamp(22px,4vw,42px); color:#f8fff4; background:radial-gradient(ellipse at 90% 10%,#315f4b,transparent 60%),var(--pine); }
+.feature small { font-weight:700; letter-spacing:.16em; font-size:.71rem; color:var(--lime) }
+.feature h2,.feature h1 { margin:8px 0; font:normal clamp(2.2rem,5vw,3.9rem)/1.12 Georgia,serif; letter-spacing:-.04em }
+.feature p { color:#dbe7d9; max-width:40em }
+.spotlight { display:grid; grid-template-columns:1fr auto; align-items:center; gap:16px }
+.feature label { display:flex; align-items:center; gap:10px; color:#dfebda; font-size:.9rem }
+.feature select,.feature button { color:white; background:#234d41; border-color:#719081 }
+.feature button:hover { color:var(--ink) }
+.feature .action { background:var(--lime); color:#193b2f; border-color:var(--lime) }
+.launch { margin-top:15px }
+.dial { width:clamp(110px,17vw,180px); aspect-ratio:1; border:1px solid #85a68a; padding:8px; border-radius:50%; background:repeating-conic-gradient(from 0deg,#9bb590 0 1deg,transparent 1deg 10deg); display:grid; place-items:center }
+.dial div { border-radius:50%; width:100%; height:100%; background:#234b3d; display:flex; flex-direction:column; justify-content:center; align-items:center; border:1px solid #8fae8d }
+.dial strong,.digits,.numbers b { font-variant-numeric:tabular-nums }
+.dial strong { font-size:clamp(1.8rem,4vw,3rem); font-weight:600; line-height:1.1 }
+.dial span { font-size:.75rem; color:#d3e7c9 }
+.detail-strip { border-bottom:1px solid var(--edge); padding:15px 4px; gap:20px; color:var(--muted); font-size:.9rem }
+.stage-list { padding:14px 4px; color:var(--muted); border-bottom:1px solid var(--edge) }
+.stage-list summary { cursor:pointer; font-weight:650; color:var(--ink) }
+.stage-list ol,.stage-list p { margin-top:12px }
+.filters { gap:6px; margin-bottom:14px }
+.filters button { border-radius:24px; padding:6px 14px; font-size:.88rem }
+.filters button[aria-pressed=true] { background:var(--pine); color:white }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(205px,1fr)); gap:10px; margin-bottom:22px }
+.cards button { display:flex; align-items:center; padding:16px 12px; text-align:left; gap:12px; border-color:var(--edge); }
+.cards button[aria-pressed=true] { background:#edf5dc; border-color:#779653; box-shadow:inset 3px 0 #779653 }
+.cards strong,.cards small { display:block }
+.cards small { font-weight:400; color:var(--muted); margin-top:2px }
+.glyph { display:grid; place-items:center; width:36px; height:36px; flex:none; border-radius:10px; font-size:1.5rem; background:#e0edcf; color:#345433 }
+.glyph.Position { background:#d9ece5; color:#275e53 }.glyph.Sound { background:#f5e4cc; color:#855225 }.glyph.Mixed { background:#e9e0ef; color:#684776 }
+#classic { margin:27px 0 } .classic-actions { margin-top:12px }
+footer { font-size:.85rem; color:var(--muted); padding:18px 0; border-top:1px solid var(--edge) }
+.live,.result { margin:22px 0 }
+.digits { font-size:clamp(2.5rem,6vw,4rem); font-weight:650 }
+.live progress { width:100%; accent-color:var(--lime); height:12px }
+.numbers { display:flex; flex-wrap:wrap; gap:25px; margin:18px 0 25px }
+.numbers span { display:grid; font-size:.8rem; color:#d6e5d2 }
+.numbers b { font-size:1.5rem; color:white }
+section[aria-label="Session monitoring"],.jumbotron { border:1px solid var(--edge); border-radius:16px; background:#fff; padding:22px; margin-top:16px }
+.btn-primary { background:var(--pine); border-color:var(--pine) }
+.table { background:white; color:var(--ink) } pre { white-space:pre-wrap; overflow-wrap:anywhere }
+@media(max-width:540px) { .spotlight { grid-template-columns:1fr; position:relative } .dial { display:none } .cards { grid-template-columns:1fr 1fr } .cards button { padding:10px; gap:6px } .glyph { width:25px;height:29px } .studio-title input { width:100% } }
+@media(max-width:380px) { .cards { grid-template-columns:1fr } }
+.mobile-target { display:none }
+@media(max-width:540px) { .mobile-target { display:inline } }
+.guide-links {display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;margin:20px 0}
+.guide-links h2{flex-basis:100%}.guide-links a{color:var(--pine);display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:640px){
+    .studio button,.studio select,.studio input,.container .btn,.container input:not([type=checkbox]),.container select{min-height:44px}
+    .studio input,.studio select,.container .form-control{font-size:16px;max-width:100%}
+    .mast a,footer a,.stage-list summary{display:inline-flex;align-items:center;min-height:44px}
+    .stage-list summary{display:list-item;padding:10px 0}
+    .feature label,.launch,.classic-actions{flex-wrap:wrap}
+    .cards button,.spotlight>*{min-width:0;overflow-wrap:anywhere}
+    .classic-actions button{flex:1 1 12rem}.detail-strip{gap:8px 16px}
+    .display-1,.display-2,.display-3{font-size:clamp(2rem,9vw,3.5rem);overflow-wrap:anywhere}
+    .container .table{table-layout:fixed}.table td,.table th,.container pre{overflow-wrap:anywhere}
+}
