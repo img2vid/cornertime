@@ -7,13 +7,14 @@ const escape = value => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;
 const base = require('../package.json').homepage;
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ct-guides-'));
 try {
-    for (const name of ['challenges', 'strict', 'duties']) {
+    for (const name of ['challenges', 'strict', 'duties', 'time']) {
         const source = fs.readFileSync(path.join('src', name + '.ts'), 'utf8');
         const js = ts.transpileModule(source, {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2017}});
         fs.writeFileSync(path.join(dir, name + '.js'), js.outputText);
     }
-    const { courses, instruction } = require(path.join(dir, 'challenges'));
+    const { courses, instruction, target } = require(path.join(dir, 'challenges'));
     const { duties } = require(path.join(dir, 'duties'));
+    const { durationLabel } = require(path.join(dir, 'time'));
     const groups = [...new Set(courses.map(c => c.group))];
     const urls = [base];
     fs.mkdirSync('public/guides', {recursive:true});
@@ -25,7 +26,7 @@ try {
         const title = group + ' Challenge Guide | Corner Time';
         const description = 'Explore ' + selected.length + ' ' + group.toLowerCase() + ' challenges, including strict courses. See stage targets, hold times and sensor requirements.';
         const dutyList = duties.filter(d => d.group === group).map(d =>
-            '<li><a href="../index.html#challenge=' + d.id + '">' + escape(d.name) + '</a></li>').join('');
+            '<li><a href="../index.html#challenge=' + d.id + '">' + escape(d.name) + '</a> · ' + durationLabel(target(d)) + ' on Standard</li>').join('');
         const contents = selected.map(c => {
             const stages = c.stages.map(s => '<li>' + escape(instruction(s.rule)) + ' Hold for ' + s.seconds + (s.streak ? ' consecutive' : ' total') + ' seconds.</li>').join('');
             return '<article id="' + c.id + '"><h2>' + escape(c.name) + '</h2><p>' + escape(c.brief) + '</p>' +

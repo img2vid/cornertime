@@ -4,10 +4,12 @@ Choose a timed duty, such as staying in place or observing quiet time. The app g
 
 ## Serve a duty
 
-1. Set your device on a steady surface. Choose **Short stillness hold** for a 20-second first session. Select **Begin duty** and allow camera access. For a sound or mixed duty, also select **Enable microphone**.
+1. Set your device on a steady surface. Choose **Short stillness hold** for a 30-minute first session. Select **Begin duty** and allow camera access. For a sound or mixed duty, also select **Enable microphone**.
 2. Settle into a comfortable position during preparation. Follow the instruction and watch the remaining time for the current hold. The camera averages changes across several small areas so a single flickering spot has less influence.
 3. When you move outside the target, the clock waits. Two consecutive missed seconds bring a spoken warning. After two good seconds, a new incident can count. Each later incident adds five seconds to the current hold, up to thirty added seconds for the whole duty. A single continuing movement earns one warning or penalty.
 4. Your served time carries forward through interruptions. Pauses and missing readings add no penalty. Use **Pause**, **Restart duty**, or **End duty** at any time. The final summary gives the time added and number of incidents.
+
+Standard duties range from **30 minutes to 3 hours**. Extended adds half again to each hold (45 minutes to 4 hours 30 minutes), and Endurance doubles it (1 to 6 hours). These are planned times. Pauses, time outside the target, and penalties can make the session take longer. Use **Pause** for breaks and **Resume** when you are ready.
 
 There are 40 duties across movement, position, sound and mixed supervision. Strict duties allow fewer off-target readings in each second. The optional practice mode below keeps the original streaks, retries and results.
 

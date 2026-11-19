@@ -174,8 +174,8 @@ it('serves a traditional duty with a warning and five seconds of added time', ()
         expect(host.textContent).toContain('Warning issued');
         tick(0); tick(0); tick(1); tick(1);
         expect(host.textContent).toContain('Five seconds added');
-        expect(host.querySelector('.digits')!.textContent).toBe('0:23');
-        for(let n=0;n<23;n++) { tick(0); }
+        expect(host.querySelector('.digits')!.textContent).toBe('30:03');
+        for(let n=0;n<1803;n++) { tick(0); }
         expect(host.textContent).toContain('SESSION COMPLETE');
         expect(host.textContent).toContain('5sTime added');
     } finally {

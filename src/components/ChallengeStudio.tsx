@@ -4,11 +4,13 @@ import { Challenge, courses, advance, scoreSecond, initialRun, instruction, Read
 
 import { assess, cleanRecord, duties } from '../duties';
 
+import { formatDuration as clock, durationLabel } from '../time';
+
 interface Result { id: string; level: string; seconds: number; hits: number; combo: number; date: string; }
 const groups = ['All', 'Strict', 'Movement', 'Position', 'Sound', 'Mixed', 'Saved'];
 const levels = ['Standard', 'Extended', 'Endurance'];
 const icons = { Movement: '≈', Position: '⌖', Sound: '≋', Mixed: '◈' };
-const clock = (s: number) => Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2);
+
 
 export default class ChallengeStudio extends React.Component<{}, {}> {
     state = { traditional: !courses.some(c => window.location.hash === '#challenge=' + c.id), discipline: cleanRecord,
@@ -206,6 +208,9 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
                 'STAGE ' + (run.stage + 1) + ' / ' + this.course.stages.length}</small><h1>{selected.name}</h1>
                 <p>{prep ? 'Settle into your starting position while the sensors get ready.' : instruction(stage.rule)}</p>
                 <div className="digits">{prep ? prep + 's' : traditional ? clock(stage.seconds - run.progress) : run.progress + ' / ' + stage.seconds + 's'}</div>
+                {traditional && !prep && this.course.stages.length > 1 && <p>Duty remaining: {clock(
+                    this.course.stages.slice(run.stage).reduce((sum, s) => sum + s.seconds, 0) - run.progress
+                )}</p>}
                 <progress aria-label="Stage progress" value={prep ? 5 - prep : run.progress} max={prep ? 5 : stage.seconds} />
                 <p>{status}{!traditional && !prep && this.state.misses > 0 && ` · Misses: ${this.state.misses} of 3`}</p><div className="numbers"><span><b>{clock(run.elapsed)}</b>{traditional ? 'Monitored time' : 'Scored time'}</span><span><b>{traditional ? this.state.discipline.added : run.combo}s</b>{traditional ? 'Time added' : 'Current streak'}</span>
                 <span><b>{prep ? '—' : traditional ? 'Timed hold' : stage.streak ? 'Streak' : 'Banked'}</b>Goal type</span></div>
@@ -215,6 +220,7 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
         }
         const visible = catalog.filter(c => (group === 'All' || (group === 'Strict' && c.strict) || c.group === group || (group === 'Saved' && saved.includes(c.id))) &&
             (c.name + ' ' + c.brief).toLowerCase().includes(search.toLowerCase()));
+        const plannedTime = durationLabel(selected.stages.reduce((sum, s) => sum + Math.ceil(s.seconds * (1 + level * .5)), 0));
         const best = records[selected.id + '.' + levels[level]];
         return <><div className="studio-title"><h1>{traditional ? 'Corner time duties' : 'Challenge studio'}</h1><div>
             <button onClick={() => this.setState({ traditional: !traditional, selected: traditional ? courses[0] : duties[0], group:'All', search:'' })}>
@@ -226,17 +232,17 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
                     {levels.map((l,i) => <option key={l} value={i}>{l}</option>)}</select></label>
                 <div className="launch"><button className="action" onClick={this.start}>{traditional ? 'Begin duty' : 'Start challenge →'}</button>
                 <button aria-pressed={saved.includes(selected.id)} onClick={this.favorite}>{saved.includes(selected.id) ? '★ Saved' : '☆ Save'}</button>{this.voiceControl()}</div></div>
-                <div className="dial"><div><strong>{selected.stages.reduce((n,s) => n + Math.ceil(s.seconds * (1 + level * .5)),0)}s</strong><span>Target time</span></div></div>
-            </section><div className="detail-strip"><span className="mobile-target">{selected.stages.reduce((n,s) => n + Math.ceil(s.seconds * (1 + level * .5)),0)}s target</span><span>{selected.stages.length} {selected.stages.length === 1 ? 'stage' : 'stages'}</span>
+                <div className="dial"><div><strong>{plannedTime}</strong><span>Target time</span></div></div>
+            </section><div className="detail-strip"><span className="mobile-target">{plannedTime} target</span><span>{selected.stages.length} {selected.stages.length === 1 ? 'stage' : 'stages'}</span>
                 <span>{selected.group === 'Sound' ? 'Microphone' : selected.group === 'Mixed' ? 'Camera + microphone' : 'Camera'}</span>
                 {!traditional && <span>{best ? 'Personal best ' + clock(best) : 'Personal best —'}</span>}</div>
             <details className="stage-list"><summary>Stage guide</summary><ol>{selected.stages.map((s,i) => <li key={i}>{instruction(s.rule)}{' '}
-                {Math.ceil(s.seconds * (1 + level * .5))} {s.streak ? 'consecutive' : 'total'} seconds.</li>)}</ol></details>
+                {durationLabel(Math.ceil(s.seconds * (1 + level * .5)))} {s.streak ? 'uninterrupted' : 'total'}.</li>)}</ol></details>
             <div className="studio-title"><h2>{traditional ? 'Choose a duty' : 'Challenge library'}</h2><input type="search" aria-label="Search challenges" placeholder="Search challenges" value={search}
                 onChange={e => this.setState({ search: e.target.value })}/></div>
             <div className="filters">{groups.map(g => <button aria-pressed={g === group} key={g} onClick={() => this.setState({group:g})}>{g}</button>)}</div>
             <div className="cards">{visible.map(c => <button key={c.id} aria-pressed={selected.id === c.id} onClick={() => this.select(c)}>
-                <span className={'glyph ' + c.group} aria-hidden="true">{icons[c.group]}</span><span><strong>{c.name}</strong><small>{c.strict && 'Strict · '}{c.group} · {target(c)}s base</small></span></button>)}</div>
+                <span className={'glyph ' + c.group} aria-hidden="true">{icons[c.group]}</span><span><strong>{c.name}</strong><small>{c.strict && 'Strict · '}{c.group} · {durationLabel(target(c))} base</small></span></button>)}</div>
             {!visible.length && <p>No matching challenges.</p>}
             <details className="stage-list"><summary>Recent sessions ({history.length})</summary>
                 {history.length === 0 ? <p>Completed challenges appear here.</p> : <ol>{history.map((r,i) => {

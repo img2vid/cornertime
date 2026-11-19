@@ -19,3 +19,11 @@ export function formatDuration(seconds: number): string {
         return `${sign}${minutes}:${formattedSeconds}`;
     }
 }
+
+export function durationLabel(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor(seconds / 60) % 60;
+    const remainder = seconds % 60;
+    return [hours && hours + 'h', minutes && minutes + 'm', remainder && remainder + 's']
+        .filter(Boolean).join(' ') || '0s';
+}

@@ -27,7 +27,7 @@ export const duties: Challenge[] = courses.map((c,i) => ({
     ...c, id: 'duty-' + c.id, name: names[i],
     brief: { Movement: 'Remain comfortably still until dismissed.', Position: 'Stay in your starting place until the timer finishes.',
         Sound: 'Observe quiet time until dismissed.', Mixed: 'Follow the instructions for each part of your corner time.' }[c.group],
-    stages: c.stages.map(s => ({ rule:dutyRule(s.rule), seconds:Math.max(15,s.seconds * 2), streak:false }))
+    stages: c.stages.map(s => ({ rule:dutyRule(s.rule), seconds:(c.strict ? 36 : 30) * 60, streak:false }))
 }));
 
 export interface Discipline { violations: number; added: number; outside: number; recovery: number; warned: boolean; }

@@ -1,5 +1,5 @@
 import { assess, cleanRecord, duties } from './duties';
-import { scoreSecond } from './challenges';
+import { scoreSecond, target } from './challenges';
 
 it('offers forty duties achievable from a still, quiet starting position', () => {
     expect(new Set(duties.map(d => d.name)).size).toBe(40);
@@ -20,5 +20,17 @@ it('warns once per incident, allows recovery and caps extra time', () => {
     for (let i=0;i<9;i++) {
         for (const ok of [true,true,false,false]) { record=assess(record,ok); }
         expect(record.added).toBe(Math.min((i+1)*5,30));
+    }
+});
+
+it('schedules every duty and all three difficulty levels between half an hour and six hours', () => {
+    const times = duties.map(target);
+    expect(Math.min(...times)).toBe(30 * 60);
+    expect(Math.max(...times)).toBe(3 * 3600);
+    for (const time of times) {
+        for (const scale of [1, 1.5, 2]) {
+            expect(time * scale).toBeGreaterThanOrEqual(1800);
+            expect(time * scale).toBeLessThanOrEqual(21600);
+        }
     }
 });
