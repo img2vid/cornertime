@@ -84,3 +84,7 @@ Choose **Design preset** to set your own times and spoken phrases. A preset is a
 - **The countdown is waiting.** Check that the browser has permission to use the camera or microphone needed for your challenge. For sound goals, check that you selected **Enable microphone**. If you blocked access earlier, change the site's permissions in your browser and start again.
 - **The position changes while you're still.** The camera compares the whole scene with the view at the end of the countdown. A moving curtain, someone walking behind you, or a phone held in your hand can change the reading. Try a steady support and a still background.
 - **The sound level is hard to read.** Numbers closer to zero mean louder input. For example, −25 is louder than −40. If the goal is to stay at or below −30, then −40 meets it and −25 misses it. Keep the same distance from the microphone while you practice.
+
+<footer>
+  <p>Made with ❤️ by Aishik Dutta &copy; 2026</p>
+</footer>
