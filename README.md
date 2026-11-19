@@ -2,6 +2,12 @@
 
 Choose a timed duty, such as staying in place or observing quiet time. The app gives spoken instructions and tells you when your time is served. [Open Corner Time](https://img2vid.github.io/cornertime/).
 
+## School penalties beyond corner time
+
+[Open **School penalties**](https://img2vid.github.io/cornertime/#school) for 36 assignments in six groups: written work, corrections, extra exercises, reflection, classroom service and study periods. Try assigned lines, a fraction sheet, a private reflection, bookshelf duty or a 30-minute seated study detention. Each assignment has its own instructions and ends when you complete its steps.
+
+Type an answer to have it checked, review your own written response, or tick a practical task after doing it in person. Study timers have a pause button and pause automatically when the page is hidden. These assignments use no camera or microphone. Your draft, timer progress and completed responses are kept in this browser. Reopen an assignment to resume or review it. After finishing, **Do this assignment again** starts a fresh copy.
+
 ## Serve a duty
 
 1. Set your device on a steady surface. Choose **Short stillness hold** for a 30-minute first session. Select **Begin duty** and allow camera access. For a sound or mixed duty, also select **Enable microphone**.

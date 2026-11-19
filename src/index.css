@@ -74,3 +74,9 @@ section[aria-label="Session monitoring"],.jumbotron { border:1px solid var(--edg
     .display-1,.display-2,.display-3{font-size:clamp(2rem,9vw,3.5rem);overflow-wrap:anywhere}
     .container .table{table-layout:fixed}.table td,.table th,.container pre{overflow-wrap:anywhere}
 }
+
+.school-link {display:inline-flex;align-items:center;padding:8px 13px;min-height:44px;border:1px solid #bfcfc5;border-radius:9px;background:white;color:var(--pine);font-weight:600}
+.school textarea {display:block;width:100%;max-width:40rem;border:1px solid var(--edge);border-radius:8px;padding:12px;font:inherit}
+.school .feature input[type=checkbox] {min-height:0;width:20px;height:20px;flex:none}
+.school .feature button:disabled {opacity:.6;cursor:default}
+.school .stage-list li p {white-space:pre-wrap;overflow-wrap:anywhere}

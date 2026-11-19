@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PunishmentStateMachine from '../state';
 import SessionMonitor from './SessionMonitor';
+import SchoolAssignments from './SchoolAssignments';
 import WelcomeScreen from './WelcomeScreen';
 import PunishmentSetup from './PunishmentSetup';
 import PunishmentLoader from './PunishmentLoader';
@@ -11,7 +12,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { formatDuration } from '../time';
 
 
-type SetupScreen = 'default' | 'custom' | 'report' | 'preset';
+type SetupScreen = 'default' | 'custom' | 'report' | 'preset' | 'school';
 
 interface AppState {
     setupScreen: SetupScreen;
@@ -22,10 +23,17 @@ class App extends React.Component<{}, AppState> {
     fsm = new PunishmentStateMachine();
 
     state: AppState = {
-        setupScreen: 'default',
+        setupScreen: window.location.hash === '#school' ? 'school' : 'default',
     };
 
+    schoolRoute = () => {
+        if (this.fsm.state !== 'waiting') { return; }
+        if (window.location.hash === '#school') { this.setState({setupScreen:'school'}); }
+        else if (this.state.setupScreen === 'school') { this.returnToWelcomeScreen(); }
+    }
+
     componentDidMount() {
+        window.addEventListener('hashchange',this.schoolRoute);
         this.fsm.addListener(this.handleFsmUpdate);
 
         // Debug globals
@@ -37,6 +45,7 @@ class App extends React.Component<{}, AppState> {
     }
 
     componentWillUnmount() {
+        window.removeEventListener('hashchange',this.schoolRoute);
         this.fsm.stopClock();
         this.fsm.removeListener(this.handleFsmUpdate);
     }
@@ -47,6 +56,8 @@ class App extends React.Component<{}, AppState> {
         switch (fsm.state) {
             case 'waiting':
                 switch (this.state.setupScreen) {
+                    case 'school':
+                        return <SchoolAssignments />;
                     case 'custom':
                         return <PunishmentSetup fsm={fsm} onBack={this.returnToWelcomeScreen} />;
                     case 'preset':

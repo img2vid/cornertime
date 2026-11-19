@@ -223,6 +223,7 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
         const plannedTime = durationLabel(selected.stages.reduce((sum, s) => sum + Math.ceil(s.seconds * (1 + level * .5)), 0));
         const best = records[selected.id + '.' + levels[level]];
         return <><div className="studio-title"><h1>{traditional ? 'Corner time duties' : 'Challenge studio'}</h1><div>
+            <a className="school-link" href="#school">School penalties</a>{' '}
             <button onClick={() => this.setState({ traditional: !traditional, selected: traditional ? courses[0] : duties[0], group:'All', search:'' })}>
                 {traditional ? 'Practice challenges' : 'Traditional duties'}</button>{' '}
             {!traditional && <><button onClick={() => this.pick(true)}>Daily pick</button>{' '}
