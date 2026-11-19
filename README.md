@@ -1,106 +1,55 @@
-# Corner Time
+# Corner Time Challenge Studio
 
-This is an application that tells you, using voice instructions, go to a corner and stay there without moving until a certain time has passed.
+How still can you stay for ten seconds? Can you move away from your starting spot and find it again? Corner Time turns small movements and sounds into 40 short challenges you can play in a browser on your phone, tablet, or computer.
 
-Use it on yourself as a conditioning method (caught yourself picking your nose? get in the corner!) or just for, err, fun. Use it on someone else as part of a long-distance D/s relationship.
+**[Open the Challenge Studio](https://img2vid.github.io/cornertime/)**
 
-Work in progress (pre-alpha). Inspired by the [Virtual Corner Time](https://cornertime.herokuapp.com) application. I am in no way affiliated with the original application. This is a clean-room implementation with improvements over the original:
+## Try your first challenge
 
-* Ultimately enabling one to **set all session parameters via a preset**, especially the session duration. This would enable one to set up a session for someone else without notifying them about the duration beforehand. Only local settings such as movement threshold (very dependant on the webcam and distance) are left for the person doing the session to configure.
-* **Setting the session duration in terms of minimum time and maximum time**. The +/- 50% setting of the original application causes a very wide duration range, for example from 30 minutes to 90 minutes assuming a nominal time of 60 minutes.
-* **Having a numeric input for session duration range** instead of a slider.
+1. Rest your phone or webcam on a steady surface with you in view. Leave it there while you play.
+2. Open the studio and choose **Steady hand**. Leave the difficulty on **Standard** and select **Start challenge**.
+3. Allow camera access when your browser asks. Settle into position for the five-second countdown.
+4. Stay still and watch the counter. Every steady second brings you closer to ten. If you move after earning six seconds, those six still count for this challenge.
+5. Finish the hold to see your time, accuracy, and longest streak. Choose **Try again** to aim for a better result or **Back to studio** to pick another challenge.
 
-Frontend done in TypeScript & React. No backend. Session monitoring runs locally. A fixed webcam samples ten times per second. The movement percentage is the fraction of changed pixels in the busiest small region. Position compares the current scene with the end of preparation, so moving the camera or changing the background can also register a shift. Enable the microphone during a session to display its relative digital level (dBFS). Position and noise are informational. Movement uses the existing warning and cooldown rules.
+## Choose what to practice
 
-## Challenge studio
+| If you want to… | Choose | What you need |
+| --- | --- | --- |
+| Freeze on cue or make a controlled movement | [Movement](https://img2vid.github.io/cornertime/guides/movement.html) | Camera |
+| Hold a spot, shift away, or return to your starting view | [Position](https://img2vid.github.io/cornertime/guides/position.html) | Camera |
+| Keep quiet or hold a soft sound at a steady level | [Sound](https://img2vid.github.io/cornertime/guides/sound.html) | Microphone |
+| Match movement, position, and sound goals in one session | [Mixed](https://img2vid.github.io/cornertime/guides/mixed.html) | Camera and microphone |
 
-Choose among 40 challenges in Movement, Position, Sound and Mixed. Open the stage guide for the sensor thresholds and hold times. Standard uses the listed base times. Extended and Endurance increase each stage goal by 50% and 100%, respectively. Daily pick rotates with the local date. Shuffle, search and favorites help find another course.
+Pick a card to see its goal. Open **Stage guide** to see what to do and how long to do it. For sound and mixed challenges, select **Enable microphone** after starting and allow access when asked.
 
-Start the challenge, allow camera access for visual goals, and press **Enable microphone** for sound or mixed courses. Position is relative to the scene captured at the end of the five-second preparation. Keep the camera fixed. Sound thresholds use microphone input level in dBFS. Sensor processing stays on the device. A sensor outage suspends scoring until enough readings are available again.
+Use **Daily pick** for today's suggestion, **Shuffle** for a surprise, or search by name. Select **☆ Save** on a challenge to find it later under **Saved**.
 
-Timed stages bank successful seconds or require a consecutive streak. In the original courses, for stillness, position and sound stages, at least 80% of valid samples must satisfy the goal during a scored second. Movement pulses need one qualifying sample. Each second requires at least five readings. You can pause, resume, or end a challenge, and switching to a hidden tab pauses scoring automatically. Completed courses show accuracy, time and best streak. The most recent 50 results, favorites and per-difficulty fastest times are stored locally. Classic sessions, preset tools and reports remain available under **Classic tools**.
+## How the timer works
 
-### Strict challenges
+Some stages let you collect good seconds a little at a time. Others ask for a **streak**, which means the seconds must be in a row. If a streak breaks, the counter for that hold starts again. Finish each stage to complete the challenge.
 
-Select **Strict** in the challenge library to find the 20 additional courses. Every stage requires a consecutive hold. A scored second requires at least eight valid readings, and every reading must meet every target for that stage. A missed target, sensor gap, manual pause or automatic background pause clears the current hold and streak. Completed stages are retained. Sensor gaps and pauses add no scored time.
+There are two ways to make a session harder:
 
-Strict courses include movement ceilings and bands, measured offsets from the starting scene, narrow microphone bands, and simultaneous camera and audio targets. Position is expressed as the number of changed tiles in the 192-tile camera view. The monitor shows the live count beside the position reading. Open the stage guide to see the thresholds and hold durations before starting. Standard, Extended and Endurance adjust hold lengths within each strict course.
+- **Choose a longer hold.** A ten-second stage on **Standard** lasts fifteen seconds on **Extended** and twenty on **Endurance**.
+- **Choose a stricter target.** The **Strict** filter shows 20 challenges where every reading must meet the goal. A missed target, a pause, or a gap in camera or microphone readings restarts the current hold. You keep the stages you have already finished.
 
-## Try it out!
+Use **Pause** when you need a break, **Resume** to continue, or **End challenge** to leave early. Switching to another tab or app pauses a studio challenge when your browser hides the page.
 
-The GitHub Pages address for this project is [img2vid.github.io/cornertime](https://img2vid.github.io/cornertime/).
+## Read the results
 
-## Publish on GitHub Pages
+**Finish time** counts the seconds the studio could score, including seconds when you missed the goal. **Accuracy** is the share of those seconds that met the goal. **Best streak** is your longest run of successful seconds.
 
-Upload the extracted project contents, including the prebuilt `docs/` folder, to the root of `img2vid/cornertime`. In Settings → Pages, select **Deploy from a branch**, choose the branch containing the upload, select **/docs**, and save. After source changes, run `bash deploy.sh` and commit the refreshed `docs/` folder.
+Your camera picture and microphone sound are processed on your device. The browser keeps your saved challenges, your fastest finish for each challenge and difficulty, and your 50 most recent completed sessions. Use the same browser on the same device to revisit them. Clearing the site's stored data removes those records.
 
-## Getting started
+## Use the classic timer
 
-Node 11+ required.
+Open **Classic tools** for a longer session with spoken instructions. The default timer starts with a duration between 10 and 15 minutes. Movement can trigger a warning or add time. The position and noise readings are for your information in this mode.
 
-    npm install
-    npm start
-    npm test
+Choose **Design preset** to set your own times and spoken phrases. A preset is a set of session instructions you can reuse. To use one someone has shared, choose **Import preset** and paste the whole preset, including its first and last lines. At the end of a classic session, you can copy its report. Choose **View report** to read a report you saved or received.
 
-## TODO
+## If something looks wrong
 
-* [ ] Ask for the user's name and reason for punishment when starting and include them in the report
-* [ ] Calibration view
-    * [ ] See the picture from the webcam to help aiming
-    * [ ] Provide a visual indicator for current level of motion
-    * [ ] Adjust the movement threshold
-* [ ] Core functionality improvements
-    * [ ] Add a configurable audible tick to tell the user the application is still working
-    * [ ] Prevent computer from going to sleep while in session
-* [ ] Custom punishment management
-    * [ ] Edit the current preset via a UI
-    * [X] Export the current preset
-    * [X] Import a preset – *currently by pasting in the same field as the JSON. Rethink when we have the preset editor UI*
-    * [ ] Select a preset from a list of default presets
-* [ ] Encouragement functionality
-    * [X] Randomly receive encouragement during session
-    * [ ] Make encouragement occur more towards the end of a session
-* [ ] Improvements under the hood
-    * [ ] Throttle webcam capture rate to 10–30 fps or even lower to conserve battery and cause less heat
-    * [ ] Consider rewriting the FSM with Redux or similar state management
-    * [ ] Separate speech, time & other side effects from the FSM
-    * [ ] Make sure there is no memory leaks
-
-## Import/export format
-
-While sharing presets and reports via links would be preferred, I have no intention to implement any kind of a backend, so they need to be self-contained.
-
-Someone receiving a preset should not know the parameters contained within, so plain JSON is not acceptable. Fixed-width lines are easier to copy & paste.
-
-To this end, we use base64 encoded JSON documents with a header and footer to identify the documents and make them easier to copy & paste.
-
-Examples follow.
-
-### Presets
-
-    -----BEGIN CORNERTIME CUSTOM PUNISHMENT------
-    eyJ0aXRsZSI6IkRlZmF1bHQiLCJkdXJhdGlvblJhbmdlIjp7Im1pbmltdW0iOjYwMCwibWF4aW11
-    bSI6OTAwfSwicGVuYWx0eVJhbmdlIjp7Im1pbmltdW0iOjYwLCJtYXhpbXVtIjoxODB9LCJwZW5h
-    bHR5UHJvYmFiaWxpdGllcyI6WzAsMV0sImVuY291cmFnZW1lbnRQcm9iYWJpbGl0eSI6MC4wNSwi
-    cGhyYXNlcyI6eyJnZXRSZWFkeSI6WyJZb3UgaGF2ZSBiZWVuIG5hdWdodHkuIEdldCBpbiB0aGUg
-    Y29ybmVyLiJdLCJzdGFydCI6WyJZb3UgYmV0dGVyIG5vdCBtb3ZlLiBJJ20gc3RhcnRpbmcgeW91
-    ciBwdW5pc2htZW50IG5vdy4iXSwiZW5jb3VyYWdlIjpbIkp1c3QgYSBmZXcgbW9yZSBtaW51dGVz
-    LiJdLCJzY29sZCI6WyJEbyBJIHNlZSB5b3UgbW92aW5nPyJdLCJwZW5hbGl6ZSI6WyJJIHdhcm5l
-    ZCB5b3Ugbm90IHRvIG1vdmUuIEknbSBhZGRpbmcgc29tZSBtb3JlIG1pbnV0ZXPCoHRvIHRoZSBj
-    bG9jay4iXSwiZW5kIjpbIllvdSBjYW4gY29tZSBvdXQgb2YgdGhlIGNvcm5lciBub3cuIl19fQo=
-    ------END CORNERTIME CUSTOM PUNISHMENT------
-
-### Reports
-
-No attempt is made to make forging reports harder. It is trivially easy to cheat by covering the webcam anyway.
-
-    -----BEGIN CORNERTIME PUNISHMENT REPORT-----
-    eyJuYW1lIjoiQW5vbnltb3VzIiwicHJlc2V0VGl0bGUiOiJEZWZhdWx0IiwiaW5pdGlhbER1cmF0
-    aW9uIjo5LCJ0b3RhbER1cmF0aW9uIjoxOSwic3RhcnRlZEF0IjoiMjAxOC0wMS0xNFQyMzowOTo1
-    NC4zMjRaIiwiZXZlbnRzIjpbeyJhZGp1c3RtZW50IjowLCJldmVudFR5cGUiOiJnZXRSZWFkeSIs
-    InRpbWUiOi0xMH0seyJhZGp1c3RtZW50IjowLCJldmVudFR5cGUiOiJzdGFydCIsInRpbWUiOjB9
-    LHsiYWRqdXN0bWVudCI6MCwiZXZlbnRUeXBlIjoic2NvbGQiLCJ0aW1lIjoxfSx7ImFkanVzdG1l
-    bnQiOjUsImV2ZW50VHlwZSI6InBlbmFsaXplIiwidGltZSI6N30seyJhZGp1c3RtZW50Ijo1LCJl
-    dmVudFR5cGUiOiJwZW5hbGl6ZSIsInRpbWUiOjEzfSx7ImFkanVzdG1lbnQiOjAsImV2ZW50VHlw
-    ZSI6ImVuZCIsInRpbWUiOjE5fV0sInZpb2xhdGlvbnMiOjN9Cg==
-    -----END CORNERTIME PUNISHMENT REPORT-----
+- **The countdown is waiting.** Check that the browser has permission to use the camera or microphone needed for your challenge. For sound goals, check that you selected **Enable microphone**. If you blocked access earlier, change the site's permissions in your browser and start again.
+- **The position changes while you're still.** The camera compares the whole scene with the view at the end of the countdown. A moving curtain, someone walking behind you, or a phone held in your hand can change the reading. Try a steady support and a still background.
+- **The sound level is hard to read.** Numbers closer to zero mean louder input. For example, −25 is louder than −40. If the goal is to stay at or below −30, then −40 meets it and −25 misses it. Keep the same distance from the microphone while you practice.
