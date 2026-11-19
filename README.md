@@ -2,6 +2,8 @@
 
 Choose a timed duty, such as staying in place or observing quiet time. The app gives spoken instructions and tells you when your time is served. [Open Corner Time](https://img2vid.github.io/cornertime/).
 
+From **Session studio**, start a Classic timer immediately, choose an on-device or monitored activity, or open **Classic tools** for presets and reports. Use **All activities** to return to the directory.
+
 ## School penalties beyond corner time
 
 [Open **School penalties**](https://img2vid.github.io/cornertime/#school) to choose from 36 duties you can do entirely on your phone, tablet or computer. Choose assigned lines, alternating lines, numbered entries, exact copies, ordered taps or timed acknowledgements. Each group offers **30, 45, 60, 90, 120 and 180 minutes**. The duration appears on the card before you begin.

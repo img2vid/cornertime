@@ -1,3 +1,4 @@
+import StudioHeader from './StudioHeader';
 import * as React from 'react';
 import { Leg, presets, schedule, typingLine, typingTasks } from '../chain';
 import { readLocal, saveLocal } from '../challenges';
@@ -103,7 +104,7 @@ export default class TypingSession extends React.Component<{chain:boolean}> {
         const {run:p,level,count,task,minutes,running,message}=this.state;
         const leg=p && p.legs[p.index];
         const name=chain?'Chain challenge':'Continuous typing penalties';
-        return <main className="studio"><header className="mast"><div className="wordmark">Corner Time</div><a href="#studio">Return to studio</a></header>
+        return <main className="studio"><StudioHeader section={name}/>
             <div className="studio-title"><h1>{name}</h1></div>
             {!p ? <section className="feature"><h2>{chain?'Plan a challenge':'Choose a typing duty'}</h2>
                 {chain?<><p>Each combination starts with a randomly timed Classic session, followed by two or more different continuous typing duties. The plan is saved as soon as you generate it.</p>

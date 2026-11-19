@@ -79,22 +79,10 @@ export default class PunishmentSetup extends React.Component<PunishmentSetupProp
     render() {
         return (
             <div className="container my-4">
-                <h2>Design a Custom Punishment</h2>
+                <h1>Design a Classic preset</h1>
 
                 <form onSubmit={this.start} className="form">
-                    <div className="row mt-3 mb-5">
-                        <div className="col-md-10">
-                            <button className="btn btn-primary btn-block btn-lg" type="submit">
-                                Start the Custom Punishment Now
-                            </button>
-                        </div>
-                        <div className="col-md-2">
-                            <button className="btn btn-secondary btn-block btn-lg" onClick={this.props.onBack}>
-                                Back
-                            </button>
-                        </div>
-                    </div>
-
+                    <fieldset><legend>Session name and duration</legend>
                     <TextField
                         name="title"
                         label="Title of the custom punishment"
@@ -118,7 +106,8 @@ export default class PunishmentSetup extends React.Component<PunishmentSetupProp
                         onChange={this.onChangeNumeric}
                     />
 
-                    {/* TODO Richer field type */}
+                    </fieldset>
+                    <details><summary>Movement penalties and encouragement</summary>
                     <TextField
                         name="penaltyProbabilities"
                         label="Penalty probabilities"
@@ -155,6 +144,7 @@ export default class PunishmentSetup extends React.Component<PunishmentSetupProp
                                    one of the encouragement phrases. This field controls that probability.`}
                     />
 
+                    </details><details><summary>Spoken prompts</summary>
                     <MultiLineField
                         name="getReadyPhrases"
                         label="Get Ready phrases"
@@ -208,14 +198,24 @@ export default class PunishmentSetup extends React.Component<PunishmentSetupProp
                         value={this.state.rawEndPhrases}
                         onChange={this.onChangePhrases}
                     />
+                    </details>
+                    <div className="row my-3">
+                        <div className="col-md-10">
+                            <button className="btn btn-primary btn-block btn-lg" type="submit">
+                                Start Classic session
+                            </button>
+                        </div>
+                        <div className="col-md-2">
+                            <button className="btn btn-secondary btn-block btn-lg" type="button" onClick={this.props.onBack}>
+                                Back
+                            </button>
+                        </div>
+                    </div>
+
                 </form>
 
-                <p className="mt-5">
-                    To have someone else use this preset without seeing its content, give this to them and instruct
-                    them to use the "I Have a Custom Punishment" link from the welcome screen.
-                </p>
-
-                <pre>{this.serializedPreset}</pre>
+                <details><summary>Share this preset</summary><p>Copy the text below. Open Import preset in Classic tools to use it.</p>
+                    <pre>{this.serializedPreset}</pre></details>
             </div>
         );
     }

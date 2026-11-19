@@ -23,31 +23,14 @@ export default class PunishmentLoader extends React.Component<PunishmentLoaderPr
     render() {
         return (
             <div className="container my-4">
-                <h2>Carry Out a Custom Punishment</h2>
-
-                <div className="row my-3">
-                    <div className="col-md-10">
-                        <button
-                            className="btn btn-primary btn-block btn-lg"
-                            onClick={this.start}
-                            disabled={!this.state.isValid}
-                        >
-                            Start the Custom Punishment Now
-                        </button>
-                    </div>
-                    <div className="col-md-2">
-                        <button className="btn btn-secondary btn-block btn-lg" onClick={this.props.onBack}>
-                            Back
-                        </button>
-                    </div>
-                </div>
+                <h1>Import a Classic preset</h1>
 
                 <form className="form">
                     <div className="form-group">
-                        <label>Custom punishment:</label>
-                        <textarea
+                        <label htmlFor="preset-code">Paste your preset</label>
+                        <textarea id="preset-code"
                             className="form-control"
-                            rows={24}
+                            rows={8}
                             cols={90}
                             value={this.state.preset}
                             onChange={this.onChange}
@@ -57,6 +40,24 @@ export default class PunishmentLoader extends React.Component<PunishmentLoaderPr
                         </small>
                     </div>
                 </form>
+                <div className="row my-3">
+                    <div className="col-md-10">
+                        <button
+                            className="btn btn-primary btn-block btn-lg"
+                            onClick={this.start}
+                            disabled={!this.state.isValid}
+                        >
+                            Start Classic session
+                        </button>
+                    </div>
+                    <div className="col-md-2">
+                        <button className="btn btn-secondary btn-block btn-lg" onClick={this.props.onBack}>
+                            Back
+                        </button>
+                    </div>
+                </div>
+
+
             </div>
         );
     }

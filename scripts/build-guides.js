@@ -29,14 +29,14 @@ try {
             '<li><a href="../index.html#challenge=' + d.id + '">' + escape(d.name) + '</a> · ' + durationLabel(target(d)) + ' on Standard</li>').join('');
         const contents = selected.map(c => {
             const stages = c.stages.map(s => '<li>' + escape(instruction(s.rule)) + ' Hold for ' + s.seconds + (s.streak ? ' consecutive' : ' total') + ' seconds.</li>').join('');
-            return '<article id="' + c.id + '"><h2>' + escape(c.name) + '</h2><p>' + escape(c.brief) + '</p>' +
+            return '<article id="' + c.id + '"><h3>' + escape(c.name) + '</h3><p>' + escape(c.brief) + '</p>' +
                 (c.strict ? '<p><strong>Strict course.</strong> Every reading must qualify. A miss, pause or gap resets the current hold.</p>' : '') +
                 '<ol>' + stages + '</ol><a href="../index.html#challenge=' + c.id + '">Open ' + escape(c.name) + ' in the studio</a></article>';
         }).join('\n');
         fs.writeFileSync('public/guides/' + file, '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' + title +
-            '</title><meta name="description" content="' + escape(description) + '"><link rel="canonical" href="' + url + '"><link rel="stylesheet" href="./guide.css"></head><body><main><a href="../index.html">Corner Time Challenge Studio</a><h1>' +
+            '</title><meta name="description" content="' + escape(description) + '"><link rel="canonical" href="' + url + '"><link rel="stylesheet" href="./guide.css"></head><body><main><a href="../index.html">← All activities</a><h1>' +
             group + ' challenges</h1><p>' + description + '</p><nav aria-label="Challenge categories">' +
-            groups.map(g => '<a href="./' + g.toLowerCase() + '.html">' + g + '</a>').join(' ') + '</nav><h2>Timed duties</h2><p>Serve the hold. The first incident brings a warning and later incidents can add time.</p><ul>' + dutyList + '</ul><h2>Optional practice challenges</h2>' + contents + '</main></body></html>');
+            groups.map(g => '<a href="./' + g.toLowerCase() + '.html"' + (g === group ? ' aria-current="page"' : '') + '>' + g + '</a>').join(' ') + '</nav><h2>Timed duties</h2><p>Serve the hold. The first incident brings a warning and later incidents can add time.</p><ul>' + dutyList + '</ul><h2>Optional practice challenges</h2>' + contents + '</main></body></html>');
     }
     fs.writeFileSync('public/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
         urls.map(u => '  <url><loc>' + escape(u) + '</loc></url>').join('\n') + '\n</urlset>\n');

@@ -23,18 +23,16 @@ export default class ReportViewer extends React.Component<ReportViewerProps, Rep
     render() {
         return (
             <div className="container my-4">
-                <h2>View the Report of a Previous Punishment</h2>
+                <h1>View a session report</h1>
 
-                <button className="btn btn-secondary btn-block btn-lg my-4" onClick={this.props.onBack}>
-                    Back
-                </button>
+
 
                 <form className="form">
                     <div className="form-group">
-                        <label>Punishment report:</label>
-                        <textarea
+                        <label htmlFor="report-code">Paste your report</label>
+                        <textarea id="report-code"
                             className="form-control"
-                            rows={12}
+                            rows={8}
                             cols={90}
                             value={this.state.reportSource}
                             onChange={this.onChange}
@@ -45,6 +43,9 @@ export default class ReportViewer extends React.Component<ReportViewerProps, Rep
                         </small>
                     </div>
                 </form>
+                <button className="btn btn-secondary btn-block btn-lg my-4" onClick={this.props.onBack}>
+                    Back
+                </button>
 
                 {this.state.report ? <ReportCard report={this.state.report} /> : null}
             </div>

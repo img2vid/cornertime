@@ -25,7 +25,7 @@ it('launches a course, waits for sensors, pauses, resumes and stores the complet
     };
     try {
         ReactDOM.render(<ChallengeStudio />, host);
-        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
+        if (Array.from(host.querySelectorAll('button')).some(b => b.textContent === 'Practice challenges')) { click('Practice challenges'); }
         click('☆ Save'); click('Saved');
         expect(host.querySelectorAll('.cards button').length).toBe(1);
         click('Start challenge →');
@@ -57,7 +57,7 @@ it('finds all strict courses and resets a strict hold on outliers, gaps and paus
     };
     try {
         ReactDOM.render(<ChallengeStudio />, host);
-        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
+        if (Array.from(host.querySelectorAll('button')).some(b => b.textContent === 'Practice challenges')) { click('Practice challenges'); }
         click('Strict');
         expect(host.querySelectorAll('.cards button')).toHaveLength(20);
         host.querySelector<HTMLButtonElement>('.cards button')!.click();
@@ -98,7 +98,7 @@ it('announces a loss and retries the same course and difficulty from a clean att
     };
     try {
         ReactDOM.render(<ChallengeStudio />, host);
-        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
+        if (Array.from(host.querySelectorAll('button')).some(b => b.textContent === 'Practice challenges')) { click('Practice challenges'); }
         const level = host.querySelector('select')!;
         level.value = '1';
         level.dispatchEvent(new Event('change', {bubbles:true}));
@@ -141,7 +141,7 @@ it.each(courses.map(c => c.id))('can lose and retry %s without navigating', id =
     const click = (label: string) => Array.from(host.querySelectorAll('button')).find(b => b.textContent === label)!.click();
     try {
         ReactDOM.render(<ChallengeStudio />, host);
-        if (host.textContent!.includes('Practice challenges')) { click('Practice challenges'); }
+        if (Array.from(host.querySelectorAll('button')).some(b => b.textContent === 'Practice challenges')) { click('Practice challenges'); }
         click('Start challenge →');
         for (let second = 0; second < 8; second++) {
             for (let i = 0; i < 10; i++) { mockRead(miss); }
