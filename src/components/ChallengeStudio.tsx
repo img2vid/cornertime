@@ -10,22 +10,68 @@ const clock = (s: number) => Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2)
 
 export default class ChallengeStudio extends React.Component<{}, {}> {
     state = { selected: courses.find(c => window.location.hash === '#challenge=' + c.id) || courses[0], group: 'All', search: '', level: 0, active: false,
-        done: false, paused: false, prep: 5, status: '', run: initialRun,
+        done: false, lost: false, misses: 0, attempt: 0, muted: readLocal<string>('voice', 'on') === 'off', paused: false, prep: 5, status: '', run: initialRun,
         saved: readLocal<string[]>('saved', []), history: readLocal<Result[]>('history', []),
         records: readLocal<{[key: string]: number}>('records', {}) };
     private samples: Reading[] = [];
+    private utterance?: SpeechSynthesisUtterance;
+    private quietUntil = 0;
+    private interruptedAudio = false;
+    private stopVoice() {
+        if (this.utterance) {
+            this.utterance.onend = null;
+            this.utterance.onerror = null;
+            this.utterance = undefined;
+            window.speechSynthesis.cancel();
+        }
+        this.quietUntil = Date.now() + 300;
+    }
+    private say(message: string) {
+        if (this.state.muted || !window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') { return; }
+        this.stopVoice();
+        const utterance = new SpeechSynthesisUtterance(message);
+        this.utterance = utterance;
+        this.quietUntil = Date.now() + 15000;
+        const finish = () => {
+            if (this.utterance === utterance) {
+                this.utterance = undefined;
+                this.quietUntil = Date.now() + 300;
+            }
+        };
+        utterance.onend = finish;
+        utterance.onerror = finish;
+        try { window.speechSynthesis.speak(utterance); } catch { finish(); }
+    }
+    private voiceControl() {
+        return <button aria-pressed={!this.state.muted} onClick={() => {
+            const muted = !this.state.muted;
+            this.stopVoice();
+            saveLocal('voice', muted ? 'off' : 'on');
+            this.setState({ muted }, () => { if (!muted) { this.say('Audio prompts on.'); } });
+        }}>Audio prompts {this.state.muted ? 'off' : 'on'}</button>;
+    }
+    private pause = () => {
+        const paused = !this.state.paused;
+        this.samples = [];
+        this.say(paused ? 'Challenge paused.' : 'Challenge resumed.');
+        this.setState({ paused, run: this.breakHold() });
+    }
     private timer = 0;
     private course = courses[0];
-    componentWillUnmount() { window.clearInterval(this.timer); document.removeEventListener('visibilitychange', this.visibility); }
-    private receive = (reading: Reading) => { if (this.samples.length < 15) { this.samples.push(reading); } }
+    componentWillUnmount() { this.stopVoice(); window.clearInterval(this.timer); document.removeEventListener('visibilitychange', this.visibility); }
+    private receive = (reading: Reading) => { if (Date.now() < this.quietUntil && (this.course.group === 'Sound' || this.course.group === 'Mixed')) {
+        this.interruptedAudio = true;
+        return;
+    }
+    if (this.samples.length < 15) { this.samples.push(reading); } }
     private breakHold() {
         const run = this.state.run;
         return this.course.strict ? { ...run, combo: 0, progress: 0 } : run;
     }
     private visibility = () => {
-        if (document.hidden && this.state.active) {
+        if (document.hidden && this.state.active && !this.state.paused) {
             this.samples = [];
-            this.setState({ paused: true, run: this.breakHold() });
+            this.pause();
         }
     }
     componentDidMount() { document.addEventListener('visibilitychange', this.visibility); }
@@ -33,7 +79,9 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
         const c = this.state.selected;
         this.course = { ...c, stages: c.stages.map(s => ({ ...s, seconds: Math.ceil(s.seconds * (1 + this.state.level * .5)) })) };
         this.samples = [];
-        this.setState({ active: true, done: false, paused: false, prep: 5, run: initialRun,
+        this.interruptedAudio = false;
+        this.say('Get ready for ' + c.name + '.' + (c.group === 'Mixed' || c.group === 'Sound' ? ' Enable the microphone.' : ''));
+        this.setState({ active: true, done: false, lost: false, misses: 0, attempt: this.state.attempt + 1, paused: false, prep: 5, run: initialRun,
             status: 'Waiting for sensors' });
         window.clearInterval(this.timer);
         this.timer = window.setInterval(this.tick, 1000);
@@ -42,25 +90,39 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
         const batch = this.samples;
         this.samples = [];
         const { prep, run, active, paused } = this.state;
-        if (!active || paused) { return; }
+        const voiceWindow = this.interruptedAudio;
+        this.interruptedAudio = false;
+        if (!active || paused || voiceWindow) { return; }
         const c = this.course;
         const rule = c.stages[run.stage].rule;
         if (prep) {
             const ready = batch.filter(r => (c.group === 'Sound' || r.motion !== undefined) &&
                 (c.group === 'Movement' || c.group === 'Position' || r.noise !== undefined));
             if (ready.length >= (c.strict ? 8 : 5)) {
+                if (prep === 1) { this.say('Stage one. ' + instruction(rule)); }
                 this.setState({ prep: prep - 1, status: 'Ready' });
             } else {
+                if (!this.state.status.startsWith('Waiting for sensors.')) { this.say('Waiting for sensors. Check device permissions.'); }
                 this.setState({ status: 'Waiting for sensors. Check permissions and enable the microphone for sound goals.' });
             }
             return;
         }
         const hit = scoreSecond(c, rule, batch);
         if (hit === undefined) {
+            if (!this.state.status.startsWith('Sensor gap') && this.state.status !== 'Waiting for sensor readings') {
+                this.say('Waiting for sensor readings.');
+            }
             this.setState({ run: this.breakHold(), status: c.strict ? 'Sensor gap · restart this hold' : 'Waiting for sensor readings' });
             return;
         }
         const next = advance(run, c, hit);
+        const misses = hit ? 0 : this.state.misses + 1;
+        if (misses >= 3) {
+            window.clearInterval(this.timer);
+            this.say('Attempt lost. Select Try again to restart this challenge.');
+            this.setState({ active: false, lost: true, misses, run: next });
+            return;
+        }
         if (next.stage === c.stages.length) {
             window.clearInterval(this.timer);
             const result = { id: c.id, level: levels[this.state.level], seconds: next.elapsed, hits: next.hits,
@@ -70,16 +132,24 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
             const records = { ...this.state.records, [key]: Math.min(this.state.records[key] || Infinity, result.seconds) };
             saveLocal('history', history);
             saveLocal('records', records);
+            this.say('Challenge complete. Best streak ' + next.bestCombo + ' seconds.');
             this.setState({ run: next, done: true, active: false, history, records });
         } else {
-            this.setState({ run: next, status: next.stage !== run.stage ? 'Stage complete' :
+            if (next.stage !== run.stage) { this.say('Stage complete. Next stage. ' + instruction(c.stages[next.stage].rule)); }
+            else if (!hit) { this.say(misses === 2 ? 'Two misses. One more ends the attempt.' : 'Outside target. One miss.'); }
+            else if (this.state.misses || next.progress === Math.ceil(c.stages[next.stage].seconds / 2)) {
+                this.say(this.state.misses ? 'Back on target.' : 'Halfway through this stage.');
+            }
+            this.setState({ run: next, misses, status: next.stage !== run.stage ? 'Stage complete' :
                 hit ? 'On target' : c.stages[run.stage].streak ? 'Streak reset' : 'Outside target' });
         }
     }
     private leave = () => {
         window.clearInterval(this.timer);
         this.samples = [];
-        this.setState({ active: false, done: false });
+        this.stopVoice();
+        if (this.state.active) { this.say('Challenge ended.'); }
+        this.setState({ active: false, done: false, lost: false });
     }
     private select = (c: Challenge) => this.setState({ selected: c }, () => {
         const heading = document.getElementById('selected-challenge');
@@ -100,6 +170,13 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
     }
     render() {
         const { active, done, paused, selected, prep, run, status, group, search, level, saved, history, records } = this.state;
+        if (this.state.lost) {
+            return <section className="feature result"><small>ATTEMPT LOST</small><h1>{selected.name}</h1>
+                <p>Three scored seconds in a row missed the target on stage {run.stage + 1}.</p>
+                <p>{instruction(this.course.stages[run.stage].rule)}</p>
+                <button className="action" onClick={this.start}>Try again</button>{' '}
+                <button onClick={this.leave}>Back to studio</button>{' '}{this.voiceControl()}</section>;
+        }
         if (done) {
             return <section className="feature result"><small>SESSION COMPLETE</small><h1>{selected.name}</h1>
                 <div className="numbers"><span><b>{clock(run.elapsed)}</b>Finish time</span>
@@ -114,11 +191,11 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
                 <p>{prep ? 'Settle into your starting position while the sensors get ready.' : instruction(stage.rule)}</p>
                 <div className="digits">{prep ? prep + 's' : run.progress + ' / ' + stage.seconds + 's'}</div>
                 <progress aria-label="Stage progress" value={prep ? 5 - prep : run.progress} max={prep ? 5 : stage.seconds} />
-                <p>{status}</p><div className="numbers"><span><b>{clock(run.elapsed)}</b>Scored time</span><span><b>{run.combo}s</b>Current streak</span>
+                <p>{status}{!prep && this.state.misses > 0 && ` · Misses: ${this.state.misses} of 3`}</p><div className="numbers"><span><b>{clock(run.elapsed)}</b>Scored time</span><span><b>{run.combo}s</b>Current streak</span>
                 <span><b>{prep ? '—' : stage.streak ? 'Streak' : 'Banked'}</b>Goal type</span></div>
-                <button onClick={() => { this.samples = []; this.setState({ paused: !paused, run: this.breakHold() }); }}>{paused ? 'Resume' : 'Pause'}</button>{' '}
-                <button onClick={this.leave}>End challenge</button></div>
-                <SessionMonitor preparing={!!prep} cameraEnabled={selected.group !== 'Sound'} onReading={this.receive} onMotion={ignoreMotion} /></section>;
+                <button onClick={this.pause}>{paused ? 'Resume' : 'Pause'}</button>{' '}
+                <button onClick={this.start}>Restart challenge</button>{' '}<button onClick={this.leave}>End challenge</button>{' '}{this.voiceControl()}</div>
+                <SessionMonitor key={this.state.attempt} preparing={!!prep} cameraEnabled={selected.group !== 'Sound'} onReading={this.receive} onMotion={ignoreMotion} /></section>;
         }
         const visible = courses.filter(c => (group === 'All' || (group === 'Strict' && c.strict) || c.group === group || (group === 'Saved' && saved.includes(c.id))) &&
             (c.name + ' ' + c.brief).toLowerCase().includes(search.toLowerCase()));
@@ -126,10 +203,10 @@ export default class ChallengeStudio extends React.Component<{}, {}> {
         return <><div className="studio-title"><h1>Challenge studio</h1><div><button onClick={() => this.pick(true)}>Daily pick</button>{' '}
             <button onClick={() => this.pick(false)}>Shuffle</button></div></div>
             <section className="feature spotlight"><div><small>{selected.strict && 'STRICT · '}{selected.group.toUpperCase()} CHALLENGE</small><h2 id="selected-challenge" tabIndex={-1}>{selected.name}</h2>
-                <p>{selected.brief}</p>{selected.strict && <p>Every reading must meet the target. A miss, pause or sensor gap restarts the current hold. Completed stages stay earned.</p>}<label>Difficulty <select value={level} onChange={e => this.setState({ level: Number(e.target.value) })}>
+                <p>{selected.brief}</p><p>Three missed seconds in a row end the attempt. A good second clears the misses.</p>{selected.strict && <p>Every reading must meet the target. A miss, pause or sensor gap restarts the current hold. Completed stages stay earned.</p>}<label>Difficulty <select value={level} onChange={e => this.setState({ level: Number(e.target.value) })}>
                     {levels.map((l,i) => <option key={l} value={i}>{l}</option>)}</select></label>
                 <div className="launch"><button className="action" onClick={this.start}>Start challenge →</button>
-                <button aria-pressed={saved.includes(selected.id)} onClick={this.favorite}>{saved.includes(selected.id) ? '★ Saved' : '☆ Save'}</button></div></div>
+                <button aria-pressed={saved.includes(selected.id)} onClick={this.favorite}>{saved.includes(selected.id) ? '★ Saved' : '☆ Save'}</button>{this.voiceControl()}</div></div>
                 <div className="dial"><div><strong>{selected.stages.reduce((n,s) => n + Math.ceil(s.seconds * (1 + level * .5)),0)}s</strong><span>Target time</span></div></div>
             </section><div className="detail-strip"><span className="mobile-target">{selected.stages.reduce((n,s) => n + Math.ceil(s.seconds * (1 + level * .5)),0)}s target</span><span>{selected.stages.length} {selected.stages.length === 1 ? 'stage' : 'stages'}</span>
                 <span>{selected.group === 'Sound' ? 'Microphone' : selected.group === 'Mixed' ? 'Camera + microphone' : 'Camera'}</span>

@@ -34,6 +34,10 @@ There are two ways to make a session harder:
 - **Choose a longer hold.** A ten-second stage on **Standard** lasts fifteen seconds on **Extended** and twenty on **Endurance**.
 - **Choose a stricter target.** The **Strict** filter shows 20 challenges where every reading must meet the goal. A missed target, a pause, or a gap in camera or microphone readings restarts the current hold. You keep the stages you have already finished.
 
+Three scored seconds in a row outside the target end an attempt. One good second clears the miss count. Sensor gaps and pauses do not add misses. After a loss, choose **Try again** to replay the same challenge at the same difficulty from stage one. You can also choose **Restart challenge** during a run. Only completed attempts enter your results.
+
+**Audio prompts** announce preparation, stage goals, missed targets, recovery, pauses, and the final result when your browser supports speech. Use the audio button to mute or turn them back on. Sound and mixed challenges briefly suspend scoring during prompts so the microphone does not count the spoken feedback.
+
 Use **Pause** when you need a break, **Resume** to continue, or **End challenge** to leave early. Switching to another tab or app pauses a studio challenge when your browser hides the page.
 
 ## Read the results

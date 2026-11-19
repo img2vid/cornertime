@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import ChallengeStudio from './ChallengeStudio';
-import { Reading } from '../challenges';
+import { Reading, courses, evaluate } from '../challenges';
 
 let mockRead: (reading: Reading) => void;
 jest.mock('./SessionMonitor', () => (props: any) => {
@@ -74,6 +74,83 @@ it('finds all strict courses and resets a strict hold on outliers, gaps and paus
     } finally {
         ReactDOM.unmountComponentAtNode(host);
         document.body.removeChild(host);
+        jest.useRealTimers();
+    }
+});
+
+it('announces a loss and retries the same course and difficulty from a clean attempt', () => {
+    jest.useFakeTimers();
+    localStorage.clear();
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const spoken: string[] = [];
+    const voice = { speak: (u: SpeechSynthesisUtterance) => spoken.push(u.text), cancel: jest.fn() };
+    const w = window as any;
+    const previous = [w.speechSynthesis, w.SpeechSynthesisUtterance];
+    w.speechSynthesis = voice;
+    w.SpeechSynthesisUtterance = class { constructor(public text: string) {} };
+    const click = (label: string) => Array.from(host.querySelectorAll('button')).find(b => b.textContent === label)!.click();
+    const second = (motion: number) => {
+        for (let i = 0; i < 10; i++) { mockRead({motion}); }
+        jest.advanceTimersByTime(1000);
+    };
+    try {
+        ReactDOM.render(<ChallengeStudio />, host);
+        const level = host.querySelector('select')!;
+        level.value = '1';
+        level.dispatchEvent(new Event('change', {bubbles:true}));
+        click('Start challenge →');
+        for (let i = 0; i < 5; i++) { second(0); }
+        second(1); second(1); second(0);
+        expect(spoken).toContain('Back on target.');
+        second(1); second(1); second(1);
+        expect(host.textContent).toContain('ATTEMPT LOST');
+        expect(spoken.join(' ')).toContain('Attempt lost.');
+        expect(localStorage.getItem('ct.history')).toBeNull();
+        click('Try again');
+        for (let i = 0; i < 5; i++) { second(0); }
+        expect(host.querySelector('.digits')!.textContent).toBe('0 / 15s');
+        for (let i = 0; i < 15; i++) { second(0); }
+        expect(host.textContent).toContain('SESSION COMPLETE');
+        expect(spoken.join(' ')).toContain('Challenge complete.');
+        expect(JSON.parse(localStorage.getItem('ct.history')!)).toHaveLength(1);
+    } finally {
+        ReactDOM.unmountComponentAtNode(host);
+        document.body.removeChild(host);
+        [w.speechSynthesis, w.SpeechSynthesisUtterance] = previous;
+        jest.useRealTimers();
+    }
+});
+
+it.each(courses.map(c => c.id))('can lose and retry %s without navigating', id => {
+    const course = courses.find(c => c.id === id)!;
+    const rule = course.stages[0].rule;
+    const candidates = [
+        {motion:1, shifted:true, tiles:100, noise:0},
+        {motion:0, shifted:false, tiles:0, noise:-60}
+    ];
+    const miss = candidates.find(r => evaluate(rule, r) === false)!;
+    expect(miss).toBeDefined();
+    jest.useFakeTimers();
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    window.location.hash = 'challenge=' + id;
+    const click = (label: string) => Array.from(host.querySelectorAll('button')).find(b => b.textContent === label)!.click();
+    try {
+        ReactDOM.render(<ChallengeStudio />, host);
+        click('Start challenge →');
+        for (let second = 0; second < 8; second++) {
+            for (let i = 0; i < 10; i++) { mockRead(miss); }
+            jest.advanceTimersByTime(1000);
+        }
+        expect(host.textContent).toContain('ATTEMPT LOST');
+        click('Try again');
+        expect(host.querySelector('h1')!.textContent).toBe(course.name);
+        expect(host.querySelector('.digits')!.textContent).toBe('5s');
+    } finally {
+        ReactDOM.unmountComponentAtNode(host);
+        document.body.removeChild(host);
+        window.location.hash = '';
         jest.useRealTimers();
     }
 });
