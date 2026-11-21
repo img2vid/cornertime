@@ -1,4 +1,4 @@
-import { compareFrames, decibels, height, width } from './monitoring';
+import { compareFrames, height, width } from './monitoring';
 
 it('ignores uniform exposure changes and single noisy pixels at the default threshold', () => {
     const reference = new Uint8Array(width * height).fill(80);
@@ -20,9 +20,4 @@ it('detects a small movement and distinguishes holding a shifted position', () =
     expect(compareFrames(frame, start).peak).toBeGreaterThan(.5);
     expect(compareFrames(frame, start).shifted).toBe(true);
     expect(compareFrames(start, start).shifted).toBe(false);
-});
-
-it('reports silence and half-scale microphone samples', () => {
-    expect(decibels(new Uint8Array([128, 128]))).toBe(-Infinity);
-    expect(decibels(new Uint8Array([64, 192]))).toBeCloseTo(-6.02);
 });

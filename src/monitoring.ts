@@ -43,12 +43,3 @@ export function compareFrames(frame: Uint8Array, reference: Uint8Array) {
     }
     return { peak: strongest.reduce((sum, value) => sum + value, 0) / strongest.length, changedTiles, shifted: changedTiles >= 6 };
 }
-
-export function decibels(samples: Uint8Array) {
-    let squares = 0;
-    for (let i = 0; i < samples.length; i++) {
-        const sample = (samples[i] - 128) / 128;
-        squares += sample * sample;
-    }
-    return 10 * Math.log10(squares / samples.length);
-}

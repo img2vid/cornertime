@@ -22,10 +22,10 @@ Preset 1 assigns exactly one hour, including Classic preparation. Actual complet
 
 ## Use the classic timer
 
-Open **Classic tools** for a longer session with spoken instructions. On the main screen choose **Fixed duration** and type minutes, or **Random duration** and enter a starting and ending number of minutes. Both endpoints are included. Select **Start Classic session**. A separate button starts the original 10–15 minute session. Movement can trigger a warning or add time. The position and noise readings are for your information in this mode.
+Open **Classic tools** for a longer session with spoken instructions. On the main screen choose **Fixed duration** and type minutes, or **Random duration** and enter a starting and ending number of minutes. Both endpoints are included. Select **Start Classic session**. A separate button starts the original 10–15 minute session. Movement can trigger a warning or add time. The camera position reading is for your information in this mode.
 
 Choose **Design preset** to set your own times and spoken phrases. A preset is a set of session instructions you can reuse. To use one someone has shared, choose **Import preset** and paste the whole preset, including its first and last lines. At the end of a classic session, you can copy its report. Choose **View report** to read a report you saved or received.
 
 ## Appearance
 
-Open **Appearance** on any screen. System follows the device's light or dark setting. Light and Dark override it. Forest, Ocean, and Plum work in every mode. This browser remembers both choices. All screens share one corner wallpaper.
+Open **Appearance** on any screen. System follows the device's light or dark setting. Light and Dark override it. Forest, Ocean, and Plum work in every mode. This browser remembers both choices. All screens share one corner wallpaper. Dark mode dims and desaturates the photograph while keeping controls and text at their normal contrast.
