@@ -7,7 +7,7 @@ it('renders without crashing', () => {
     ReactDOM.render(<App />, div);
 });
 
-it('opens the activity directory, preset tools, practice and existing challenge links', () => {
+it('opens the activity directory, preset tools, retained activities and retired links', () => {
     const host = document.createElement('div');
     document.body.appendChild(host);
     const previousScroll = window.scrollTo;
@@ -20,13 +20,11 @@ it('opens the activity directory, preset tools, practice and existing challenge 
     try {
         ReactDOM.render(<App/>, host);
         expect(visit('#home')).toBe('Session studio');
-        expect(host.querySelectorAll('.mode-grid a')).toHaveLength(5);
+        expect(host.querySelectorAll('.mode-grid a')).toHaveLength(3);
         expect(host.querySelector('.classic-duration')).toBeTruthy();
         expect(visit('#custom')).toBe('Design a Classic preset');
-        expect(visit('#practice')).toBe('Practice challenges');
-        expect(host.querySelector('#selected-challenge')!.textContent).toBe('Steady hand');
-        expect(visit('#challenge=duty-steady')).toBe('Traditional duties');
-        expect(host.querySelector('#selected-challenge')!.textContent).toBe('Short stillness hold');
+        expect(visit('#practice')).toBe('Session studio');
+        expect(visit('#challenge=duty-steady')).toBe('Session studio');
         expect(visit('#continuous')).toBe('Continuous typing penalties');
         expect(visit('#chain')).toBe('Chain challenge');
         expect(visit('#school')).toBe('School penalties');

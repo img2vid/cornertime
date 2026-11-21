@@ -16,11 +16,11 @@ export interface TextFieldProps extends FieldProps {
 
 export const TextField = (props: TextFieldProps) => (
     <div className="form-group row">
-        <label className="col-sm-3 col-form-label">{props.label}</label>
+        <label htmlFor={props.name} className="col-sm-3 col-form-label">{props.label}</label>
         <div className="col-sm-9">
             <input
                 className="form-control"
-                name={props.name}
+                id={props.name} name={props.name}
                 type="text"
                 maxLength={255}
                 value={props.value}
@@ -40,11 +40,11 @@ export interface NumericFieldProps extends FieldProps {
 
 export const SecondsField = (props: NumericFieldProps) => (
     <div className="form-group row">
-        <label className="col-sm-3 col-form-label">{props.label}</label>
+        <label htmlFor={props.name} className="col-sm-3 col-form-label">{props.label}</label>
         <div className="col-sm-9">
             <input
                 className="form-control"
-                name={props.name}
+                id={props.name} name={props.name}
                 type="number"
                 min={0}
                 max={86400}
@@ -59,11 +59,11 @@ export const SecondsField = (props: NumericFieldProps) => (
 
 export const ProbabilityField = (props: NumericFieldProps) => (
     <div className="form-group row">
-        <label className="col-sm-3 col-form-label">{props.label}</label>
+        <label htmlFor={props.name} className="col-sm-3 col-form-label">{props.label}</label>
         <div className="col-sm-9">
             <input
                 className="form-control"
-                name={props.name}
+                id={props.name} name={props.name}
                 type="number"
                 min={0.0}
                 max={1.0}
@@ -85,12 +85,12 @@ export interface MultiLineFieldProps extends FieldProps {
 
 export const MultiLineField = (props: MultiLineFieldProps) => (
     <div className="form-group row">
-        <label className="col-sm-3 col-form-label">{props.label}</label>
+        <label htmlFor={props.name} className="col-sm-3 col-form-label">{props.label}</label>
         <div className="col-sm-9">
             <textarea
                 rows={6}
                 className="form-control"
-                name={props.name}
+                id={props.name} name={props.name}
                 value={props.value}
                 onChange={props.onChange}
             />

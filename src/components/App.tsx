@@ -2,7 +2,6 @@ import * as React from 'react';
 import PunishmentStateMachine from '../state';
 import SessionMonitor from './SessionMonitor';
 import StudioHeader from './StudioHeader';
-import ChallengeStudio from './ChallengeStudio';
 import TypingSession from './TypingSession';
 import SchoolAssignments from './SchoolAssignments';
 import WelcomeScreen from './WelcomeScreen';
@@ -15,12 +14,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { formatDuration } from '../time';
 
 
-type SetupScreen = 'default' | 'custom' | 'report' | 'preset' | 'school' | 'continuous' | 'chain' | 'catalog';
+type SetupScreen = 'default' | 'custom' | 'report' | 'preset' | 'school' | 'continuous' | 'chain';
 
 function linkedScreen(): SetupScreen {
-    if (/^#challenge=/.test(window.location.hash)) { return 'catalog'; }
     switch(window.location.hash) {
-        case '#duties': case '#practice': case '#studio': return 'catalog';
         case '#custom': return 'custom';
         case '#preset': return 'preset';
         case '#report': return 'report';
@@ -79,8 +76,6 @@ class App extends React.Component<{}, AppState> {
                 switch (this.state.setupScreen) {
                     case 'chain': case 'continuous':
                         return <TypingSession key={this.state.setupScreen} chain={this.state.setupScreen === 'chain'} />;
-                    case 'catalog':
-                        return <main className="studio"><StudioHeader section="Monitored activities"/><ChallengeStudio key={window.location.hash}/></main>;
                     case 'school':
                         return <SchoolAssignments />;
                     case 'custom':
