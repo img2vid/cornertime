@@ -1,7 +1,7 @@
 import StudioHeader from './StudioHeader';
 import * as React from 'react';
 import { Leg, presets, schedule, typingLine, typingTasks } from '../chain';
-import { readLocal, saveLocal } from '../challenges';
+import { readLocal, saveLocal } from '../storage';
 import { defaultPreset, State } from '../models';
 import Machine from '../state';
 import { durationLabel, formatDuration } from '../time';

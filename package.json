@@ -16,8 +16,6 @@
     "typescript": "3.4.5"
   },
   "scripts": {
-    "prestart": "node scripts/build-guides.js",
-    "prebuild": "node scripts/build-guides.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -6,11 +6,7 @@ import StudioHeader from './StudioHeader';
 const sections = [
     {title:'On-device activities', links:[
         ['school','School penalties','Type or tap a set of entries each minute.'],
-        ['continuous','Continuous typing','Copy or transform lines at a steady pace.']
-    ]},
-    {title:'Monitored activities', links:[
-        ['duties','Traditional duties','Serve timed holds with movement, position or sound checks.'],
-        ['practice','Practice challenges','Try shorter sensor challenges and track your results.'],
+        ['continuous','Continuous typing','Copy or transform lines at a steady pace.'],
         ['chain','Chain challenge','Alternate monitored Classic sessions with a randomized set of typing duties.']
     ]}
 ];
@@ -29,10 +25,6 @@ export default function WelcomeScreen({fsm}: {fsm:PunishmentStateMachine}) {
         </section>)}
         <aside className="resources">
             <section><h2>Classic tools</h2><nav aria-label="Classic tools"><a href="#custom">Design preset</a><a href="#preset">Import preset</a><a href="#report">View report</a></nav></section>
-            <section><h2>Challenge guides</h2><nav aria-label="Challenge guides">
-                {['Movement','Position','Sound','Mixed'].map(group=><a key={group} href={'./guides/'+group.toLowerCase()+'.html'}>{group}</a>)}
-            </nav></section>
         </aside>
-        <footer>Camera and microphone processing stays on this device. <a href="https://github.com/img2vid/cornertime">Source code ↗</a></footer>
     </main>;
 }

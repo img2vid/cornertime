@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { compareFrames, decibels, height, luminance, width } from '../monitoring';
 
-import { Reading } from '../challenges';
+export interface Reading { tiles?: number; motion?: number; shifted?: boolean; noise?: number; }
 
 interface Props {
     cameraEnabled?: boolean;

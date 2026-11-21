@@ -1,7 +1,7 @@
 import StudioHeader from './StudioHeader';
 import * as React from 'react';
 import { Assignment, canEnter, fresh, promptFor, quota, schoolTasks, updateRound, Work } from '../school';
-import { readLocal, saveLocal } from '../challenges';
+import { readLocal, saveLocal } from '../storage';
 import { durationLabel, formatDuration } from '../time';
 
 const groups = ['All', ...Array.from(new Set(schoolTasks.map(t => t.group)))];
