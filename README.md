@@ -1,6 +1,6 @@
-# Corner Time
+# Cornertime & Lines Punishment
 
-Choose a timed duty, such as staying in place or observing quiet time. The app gives spoken instructions and tells you when your time is served. [Open Corner Time](https://img2vid.github.io/cornertime/).
+Choose a timed duty, such as staying in place or observing quiet time. The app gives spoken instructions and tells you when your time is served. [Open Cornertime & Lines Punishment](https://img2vid.github.io/cornertime/).
 
 From **Session studio**, start a Classic timer immediately, choose an on-device activity, or open **Classic tools** for presets and reports. Use **All activities** to return to the directory.
 
