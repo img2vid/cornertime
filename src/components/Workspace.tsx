@@ -1,7 +1,7 @@
 import * as React from 'react';
 import App from './App';
 import {messages, suggestion, Turn} from '../chat';
-import {Appearance, respond} from '../assistant';
+import {Appearance, navigationSuggestion, respond} from '../assistant';
 import {readLocal, saveLocal} from '../storage';
 
 const modes=['System','Light','Dark'];
@@ -74,6 +74,12 @@ export default function Workspace(){
             setHistory(transcript.concat({from:'Assistant',text:answer}));setDraft('');active.current=false;setBusy(false);setNotice('');say(answer);
         }
         if(direct){finish(direct);return;}
+        const navigation=navigationSuggestion(query);
+        if(navigation){
+            commandScreen.current=window.location.hash;
+            setPending(navigation);
+            finish('Choose Apply action to '+navigation+'.');return;
+        }
         active.current=true;setBusy(true);setNotice('Loading the local AI runtime…');
         const context=[respond('read screen',change),respond('list controls',change)].join(' · ');
         commandScreen.current=window.location.hash;

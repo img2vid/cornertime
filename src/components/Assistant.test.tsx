@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {act} from 'react-dom/test-utils';
 import Workspace from './Workspace';
-import {respond} from '../assistant';
+import {navigationSuggestion, respond} from '../assistant';
 
 it('operates the mounted chain form and retrieves help without triggering a session',()=>{
     const host=document.createElement('div');
@@ -31,4 +31,9 @@ it('operates the mounted chain form and retrieves help without triggering a sess
         ReactDOM.unmountComponentAtNode(host);host.remove();scroll.mockRestore();layout.mockRestore();
         window.history.replaceState(null,'','/');localStorage.clear();
     }
+});
+
+it('grounds a descriptive request to navigate in the actual activity directory',()=>{
+    expect(navigationSuggestion('Could you take me to the activity that combines timers and typing?')).toBe('open chain challenge');
+    expect(navigationSuggestion('Write a story about timers and typing.')).toBeUndefined();
 });

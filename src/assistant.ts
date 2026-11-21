@@ -100,3 +100,18 @@ export function respond(input:string, appearance:(patch:Partial<Appearance>)=>vo
     }
     return undefined;
 }
+
+// Resolve descriptive navigation requests against the directory before asking the
+// small model to explain or guess which activity a user meant.
+export function navigationSuggestion(input:string){
+    if(!/\b(take me to|bring me to|navigate to|open|go to|switch to|show me)\b/i.test(input) || /\b(don't|do not|never)\b/i.test(input)){return undefined;}
+    const target=input.toLowerCase().replace(/^.*?\b(take me to|bring me to|navigate to|open|go to|switch to|show me)\b/,'')
+        .replace(/\b(the|an?|activity|that|which|with|and|please)\b/g,' ').replace(/[^a-z0-9 ]/g,' ').trim();
+    const directory=[
+        ['combines timers typing','chain challenge'],['chain challenge','chain challenge'],['alternating classic typing stages','chain challenge'],
+        ['continuous typing','continuous typing'],['uninterrupted typing','continuous typing'],['school penalties','school penalties'],
+        ['classic timer','classic timer'],['design preset','design preset'],['import preset','import preset'],['view report','view report'],['home','home']
+    ];
+    const found=match(target,directory.map(([name,value])=>({name,value})));
+    return found ? 'open '+found : undefined;
+}
