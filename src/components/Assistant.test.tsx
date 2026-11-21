@@ -15,7 +15,7 @@ it('operates the mounted chain form and retrieves help without triggering a sess
         window.history.replaceState(null,'','#chain');
         act(()=>{ReactDOM.render(<Workspace/>,host);});
         expect(ask('list controls')).toContain('Generate chain');
-        expect(ask('How does continuous typing work?')).toMatch(/keystrokes/i);
+        expect(ask('How does continuous typing work?')).toBeUndefined();
         expect(ask('switch to dark mode')).toBeTruthy();
         expect(change).toHaveBeenCalledWith({mode:'dark'});
         expect(ask('set combinations to 4')).toMatch(/updated/i);

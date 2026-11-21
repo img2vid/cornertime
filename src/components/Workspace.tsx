@@ -1,5 +1,6 @@
 import * as React from 'react';
 import App from './App';
+import {messages, suggestion, Turn} from '../chat';
 import {Appearance, respond} from '../assistant';
 import {readLocal, saveLocal} from '../storage';
 
@@ -15,7 +16,7 @@ export default function Workspace(){
     const [appearance,setAppearance]=React.useState(preference);
     const [panel,setPanel]=React.useState('');
     const [input,setInput]=React.useState('');
-    const [history,setHistory]=React.useState<Array<{from:string;text:string}>>([]);
+    const [history,setHistory]=React.useState<Turn[]>([]);
     const [notice,setNotice]=React.useState('');
     const [listening,setListening]=React.useState(false);
     const [pack,setPack]=React.useState(false);
@@ -23,15 +24,21 @@ export default function Workspace(){
     const [busy,setBusy]=React.useState(false);
     const recognition=React.useRef<any>(null);
     const voiceRun=React.useRef(0);
-    const model=React.useRef<any>(null);
+    const worker=React.useRef<Worker|null>(null);
+    const [draft,setDraft]=React.useState('');
+    const [pending,setPending]=React.useState('');
+    const [failed,setFailed]=React.useState('');
+    const commandScreen=React.useRef('');
+    const previousTurns=React.useRef<Turn[]>([]);
+    const active=React.useRef(false);
     const log=React.useRef<HTMLDivElement>(null);
     React.useEffect(()=>{
         document.documentElement.dataset.mode=appearance.mode;
         document.documentElement.dataset.palette=appearance.palette;
         saveLocal('appearance',appearance);
     },[appearance]);
-    React.useEffect(()=>{if(log.current){log.current.scrollTop=log.current.scrollHeight;}},[history,panel]);
-    React.useEffect(()=>()=>{voiceRun.current++;if(recognition.current){recognition.current.abort();}if(model.current){model.current.destroy();}},[]);
+    React.useEffect(()=>{if(log.current){log.current.scrollTop=log.current.scrollHeight;}},[history,draft,panel]);
+    React.useEffect(()=>()=>{voiceRun.current++;if(recognition.current){recognition.current.abort();}if(worker.current){worker.current.terminate();}},[]);
     function change(patch:Partial<Appearance>){setAppearance(prev=>({...prev,...patch}));}
     function stop(){
         voiceRun.current++;
@@ -39,31 +46,56 @@ export default function Workspace(){
         setListening(false);
     }
     function toggle(name:string){stop();setPanel(panel===name?'':name);setNotice('');}
-    async function send(raw:string){
+    function stopGeneration(){
+        if(worker.current){worker.current.terminate();worker.current=null;}
+        active.current=false;setBusy(false);setDraft('');setNotice('Generation stopped.');
+    }
+    function say(answer:string){
+        if(!speak){return;}
+        const synth=window.speechSynthesis;
+        const voices=synth?synth.getVoices().filter(v=>v.localService):[];
+        const voice=voices.find(v=>/^en/i.test(v.lang)) || voices[0];
+        if(voice){const utter=new SpeechSynthesisUtterance(answer);utter.voice=voice;synth.speak(utter);}
+        else{setNotice('No installed speech voice is available.');}
+    }
+    function send(raw:string,retry=false){
         const query=raw.trim();
-        if(!query || busy){return;}
-        stop();setInput('');setNotice('');setBusy(true);
-        setHistory(h=>h.concat({from:'You',text:query}).slice(-40));
-        let answer='';
-        try{
-            answer=respond(query,change)||'';
-            if(!answer){
-                const engine=(window as any).LanguageModel;
-                const options={expectedInputs:[{type:'text',languages:['en']}],expectedOutputs:[{type:'text',languages:['en']}]};
-                if(engine && await engine.availability(options)==='available'){
-                    if(!model.current){model.current=await engine.create({...options,initialPrompts:[{role:'system',content:'Answer briefly in English. You can answer questions, but cannot perform actions or see the page.'}]});}
-                    answer=await model.current.prompt(query);
-                }else{answer='I can help with Corner Time. Try “list controls” or ask about a timer, preset, typing, or chain. Broader questions require an installed browser language model.';}
-            }
-        }catch{answer='I could not finish that request. Try “list controls” for actions on this screen.';}
-        setHistory(h=>h.concat({from:'Assistant',text:answer}).slice(-40));setBusy(false);
-        if(speak){
-            const synth=window.speechSynthesis;
-            const voices=synth?synth.getVoices().filter(v=>v.localService):[];
-            const voice=voices.find(v=>/^en/i.test(v.lang)) || voices[0];
-            if(voice){const utter=new SpeechSynthesisUtterance(answer);utter.voice=voice;synth.speak(utter);}
-            else{setNotice('No installed speech voice is available. The reply is shown above.');}
+        if(!query || active.current){return;}
+        stop();setInput('');setNotice('');setPending('');setDraft('');setFailed('');
+        const past=retry?previousTurns.current:history.filter((turn,i)=>turn.from!=='You' || (history[i+1] && history[i+1].from==='Assistant'));
+        previousTurns.current=past;
+        const transcript=past.concat({from:'You',text:query}).slice(-39);
+        setHistory(transcript);
+        // Explicit interface commands stay immediate, including before the model download.
+        // Free-form messages and questions always go through the generative model.
+        const direct=/^(?:open |go to |click |press |switch to |start (?:a |an )?\d|set .+ to |generate chain$|pause$|begin or resume$|list controls$|time left$|use (forest|ocean|plum)$)/i.test(query)
+            && !/[?]/.test(query) ? respond(query,change) : undefined;
+        function finish(answer:string){
+            setHistory(transcript.concat({from:'Assistant',text:answer}));setDraft('');active.current=false;setBusy(false);setNotice('');say(answer);
         }
+        if(direct){finish(direct);return;}
+        active.current=true;setBusy(true);setNotice('Loading the local AI runtime…');
+        const context=[respond('read screen',change),respond('list controls',change)].join(' · ');
+        commandScreen.current=window.location.hash;
+        function fail(reason:string){
+            stopGeneration();setFailed(query);
+            setNotice('Could not generate a reply. '+reason+' Check your connection for the first download and available device memory, then retry.');
+        }
+        try{
+            if(!worker.current){worker.current=new Worker(process.env.PUBLIC_URL+'/chat-worker.js',{type:'module'});}
+            worker.current.onmessage=({data})=>{
+                if(data.type==='token'){setDraft(prior=>prior+data.text);}
+                else if(data.type==='status'){setNotice(data.text);}
+                else if(data.type==='error'){fail(data.text);}
+                else if(data.type==='done'){setPending(suggestion(data.text));finish(data.text);}
+            };
+            worker.current.onerror=(e)=>fail(e.message || 'The browser could not load the model worker.');
+            worker.current.postMessage({messages:messages(past,query,context)});
+        }catch(error){fail(error.message || String(error));}
+    }
+    function applySuggestion(){
+        const feedback=window.location.hash!==commandScreen.current?'The screen changed. Ask again on this screen.':respond(pending,change) || 'That action is unavailable on this screen.';
+        setPending('');setNotice(feedback);
     }
     async function listen(){
         if(listening){stop();return;}
@@ -107,14 +139,18 @@ export default function Workspace(){
             <label>Color theme <select value={appearance.palette} onChange={e=>change({palette:e.target.value})}>{palettes.map(v=><option value={v.toLowerCase()} key={v}>{v}</option>)}</select></label>
         </section>}
         {panel==='chat' && <section className="assistant-panel" aria-label="Local assistant">
-            <h2>Local assistant</h2>
-            <p>Ask about an activity or tell me what to do. Try “open chain challenge” or “list controls”.</p>
-            <div className="chat-log" role="log" ref={log}>{history.map((message,i)=><p key={i}><strong>{message.from}</strong> {message.text}</p>)}</div>
+            <h2>Generative AI chat</h2>
+            <p>Chat with SmolLM2 on your device. The first AI reply downloads about 365 MB of model weights plus the runtime. Try “Write a four-line poem about rain”, then “Make the last line funny”.</p>
+            <div className="chat-log" role="log" ref={log}>{history.map((message,i)=><p key={i}><strong>{message.from}</strong> {message.text}</p>)}{draft && <p aria-live="off"><strong>Assistant</strong> {draft}</p>}</div>
+            {pending && <button onClick={applySuggestion}>Apply action · {pending}</button>}
             <form onSubmit={e=>{e.preventDefault();send(input);}}><label htmlFor="assistant-command">Message</label>
             <div className="chat-entry"><input id="assistant-command" value={input} maxLength={3000} onChange={e=>setInput(e.target.value)}/><button disabled={busy || !input.trim()}>Send</button></div></form>
             <div className="voice-tools"><button disabled={busy} onClick={listen}>{listening?'Stop listening':pack?'Install English speech pack':'Listen'}</button>
             <label><input type="checkbox" checked={speak} onChange={e=>{setSpeak(e.target.checked);if(window.speechSynthesis){window.speechSynthesis.getVoices();if(!e.target.checked){window.speechSynthesis.cancel();}}}}/> Speak replies</label></div>
-            <div role="status">{busy?'Thinking…':notice}</div>
+            {busy && <button onClick={stopGeneration}>Stop generation</button>}
+            {failed && !busy && <button onClick={()=>send(failed,true)}>Retry message</button>}
+            {!!history.length && !busy && <button onClick={()=>{setHistory([]);setPending('');setFailed('');setNotice('');previousTurns.current=[];}}>New conversation</button>}
+            <div role="status">{notice}</div>
         </section>}</div>
         <App/>
         <footer className="site-footer"><span>Made with <span role="img" aria-label="love">❤️</span> by Aishik Dutta © 2026</span><a href="https://github.com/img2vid/cornertime">Source code ↗</a></footer>

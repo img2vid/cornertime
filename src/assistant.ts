@@ -15,17 +15,6 @@ function match<T>(query:string, choices:Array<Choice<T>>) {
     if(ranked.length && ranked[0].score>=0.48 && (!ranked[1] || ranked[0].score-ranked[1].score>.08)){return ranked[0].value;}
     return undefined;
 }
-const topics=[
-    ['chain challenge combinations presets plan stages','Choose a difficulty and 3–30 combinations, then Generate chain to preview the order. Each combination starts with Classic corner time and continues with typing. Preset 1 assigns one hour.'],
-    ['continuous typing idle keystrokes credit','Only correct advancing keystrokes within five seconds of the previous one earn time. Finish the current line when time runs out.'],
-    ['school penalties entries rounds assignments','Choose an assignment and begin the duty. Each round requires a minute and its displayed entries. Pause to save your place.'],
-    ['classic timer duration minutes random fixed','In Classic corner time, choose Fixed duration or Random duration, enter the minutes, then select Start Classic session.'],
-    ['design import preset custom phrases','Design preset lets you customize timing and spoken phrases. Import preset accepts a saved preset code.'],
-    ['view report results','View report reads a saved Classic session report. Paste the entire report code into its field.'],
-    ['voice listen microphone privacy speech local','Listen takes one spoken command using English on-device recognition. A compatible browser and its English speech pack are required. Spoken replies use an installed local voice.'],
-    ['theme appearance dark light colors','Use Appearance to choose System, Light or Dark and a color palette. Choices are saved in this browser.'],
-    ['help commands controls assistant','Try “open chain challenge”, “set combinations to 4”, “generate chain”, “what can I do here?” or “how does continuous typing work?”']
-];
 const routes=[
     ['chain challenge','chain'],['continuous typing','continuous'],['school penalties','school'],
     ['design preset','custom'],['import preset','preset'],['view report','report'],['home all activities','home'],['classic timer','classic']
@@ -54,7 +43,7 @@ export function respond(input:string, appearance:(patch:Partial<Appearance>)=>vo
     if(/^(status|where am i|how much time|time left|read screen|what.*remaining)/i.test(text)){
         return Array.from(main.querySelectorAll('h1,.feature h2,.digits,.numbers span,[role=status]')).map(e=>e.textContent).filter(Boolean).join(' · ');
     }
-    if(question){return match(text,topics.map(([name,value])=>({name,value})));}
+    if(question){return undefined;}
     if(/^(do not|don.t|never|avoid|cancel)\b/i.test(text)){return 'No action taken.';}
     const theme=text.match(/^(?:(?:switch|change|set|use|enable|turn on)\s+(?:(?:the |my )?(?:theme|mode|palette|appearance)\s+)?(?:to\s+)?)?(dark|light|system|forest|ocean|plum)(?:\s+(?:mode|theme|palette))?$/i);
     if(theme){const value=theme[1].toLowerCase();appearance(/^(dark|light|system)$/.test(value)?{mode:value}:{palette:value});return 'Appearance set to '+value+'.';}
@@ -109,5 +98,5 @@ export function respond(input:string, appearance:(patch:Partial<Appearance>)=>vo
         }else{el.click();}
         return 'Selected '+name+'.';
     }
-    return match(text,topics.map(([name,value])=>({name,value})));
+    return undefined;
 }
