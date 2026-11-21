@@ -5,13 +5,6 @@ import PunishmentStateMachine from '../state';
 
 export default class ClassicDuration extends React.Component<{fsm:PunishmentStateMachine}> {
     state={mode:'fixed',fixed:'30',from:'10',to:'15',error:''};
-    private form=React.createRef<HTMLFormElement>();
-    componentDidMount(){this.form.current!.addEventListener('classic-timer',this.startRequested);}
-    componentWillUnmount(){this.form.current!.removeEventListener('classic-timer',this.startRequested);}
-    private startRequested=(event:Event)=>{
-        const fixed=String((event as CustomEvent).detail);
-        this.launch(classicMinutes(fixed,fixed));
-    }
     private start=(e:React.FormEvent)=>{
         e.preventDefault();
         const s=this.state;
@@ -26,7 +19,7 @@ export default class ClassicDuration extends React.Component<{fsm:PunishmentStat
     }
     render(){
         const s=this.state;
-        return <form ref={this.form} className="classic-duration" onSubmit={this.start}><label>Classic duration <select value={s.mode}
+        return <form className="classic-duration" onSubmit={this.start}><label>Classic duration <select value={s.mode}
             onChange={e=>this.setState({mode:e.target.value,error:''})}><option value="fixed">Fixed duration</option><option value="range">Random duration</option></select></label>
             {s.mode==='fixed'?<label>Minutes <input type="number" min="1" step="1" required value={s.fixed} onChange={e=>this.setState({fixed:e.target.value})}/></label>:
             <><label>From (minutes) <input type="number" min="1" step="1" required value={s.from} onChange={e=>this.setState({from:e.target.value})}/></label>
