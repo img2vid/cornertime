@@ -26,34 +26,6 @@ Open **Classic tools** for a longer session with spoken instructions. On the mai
 
 Choose **Design preset** to set your own times and spoken phrases. A preset is a set of session instructions you can reuse. To use one someone has shared, choose **Import preset** and paste the whole preset, including its first and last lines. At the end of a classic session, you can copy its report. Choose **View report** to read a report you saved or received.
 
-## Appearance and local assistant
+## Appearance
 
-Open **Appearance** on any screen. System follows the device's light or dark setting. Light and Dark override it. Forest, Ocean, and Plum work in every mode. This browser remembers both choices.
-
-### Generative AI chat on GitHub Pages
-
-Open **Local assistant** and send a message. For example, ask “Write a four-line poem about a rainy classroom.” Then ask “Rewrite the second line in Bengali.” The assistant generates new text and receives recent conversation turns with each request. It can also explain the current activity. **New conversation** clears the transcript and starts fresh.
-
-The first free-form message downloads SmolLM2-360M-Instruct (approximately 365 MB of 8-bit weights), its tokenizer and the inference runtime. Keep the tab open during setup. A progress indicator shows the current download, and replies appear as the model produces them. The browser can cache model files between visits. Private browsing, storage limits, or clearing site data can cause a fresh download. **Stop generation** interrupts loading or inference and releases the worker. **Retry message** repeats a failed request.
-
-The browser runs inference on its CPU through single-threaded WebAssembly in a dedicated module worker. This runs on static HTTPS hosting, including the repository’s GitHub Pages project path, without an inference server, API key, GPU, cross-origin isolation headers, or preinstalled browser AI. The first use needs access to jsDelivr for Transformers.js and the WebAssembly runtime, and Hugging Face for model files. Messages and generated text are processed on the device. A small model can make factual mistakes and struggle with complex instructions or longer conversations. The panel retains up to 40 messages in memory and sends a bounded recent history to the model.
-
-### Taking actions
-
-Ask “Could you take me to the activity that combines timers and typing?” When the model suggests a supported command, **Apply action** runs it against the current page. You can also enter explicit commands directly, including while model files are unavailable.
-
-1. **Open chain challenge** opens setup.
-2. **Set combinations to 4** changes the combination count.
-3. **Generate chain** builds the plan. **Open assigned plan** expands it.
-4. **Begin or resume**, **Pause**, and **Time left** operate on the current session.
-5. **Switch to dark mode** or **use ocean** changes appearance.
-
-From the home screen, **start a 5-minute timer** begins Classic corner time. Use **list controls** to discover labels, **click [label]** to activate a control, or **set [field] to [value]** to edit a field. Existing session rules and form validation apply.
-
-### Voice and troubleshooting
-
-**Listen** accepts one spoken message using on-device English (US) speech recognition. Allow microphone access on HTTPS or localhost and install the browser’s English speech pack if prompted. **Speak replies** reads the answer using an installed voice. Text chat works independently of microphone permission and speech support.
-
-If loading fails, check that both download hosts are reachable, use a current WebAssembly SIMD-capable browser, and free memory by closing other tabs. Choose **Retry message**. For a local Pages preview, run the production build with `bash deploy.sh`, then serve the repository with `python -m http.server 8000` and visit `http://localhost:8000/docs/`.
-
-[Model and license](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct) · [Transformers.js](https://huggingface.co/docs/transformers.js/)
+Open **Appearance** on any screen. System follows the device's light or dark setting. Light and Dark override it. Forest, Ocean, and Plum work in every mode. This browser remembers both choices. All screens share one corner wallpaper.

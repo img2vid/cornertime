@@ -147,25 +147,19 @@ body {background:#f6f7f2;color:var(--ink)}
 :root {--surface:#fff;--soft:#edf1e8;--accent:#205947;--banner:#113d36;--on-banner:#fff;--highlight:#d6ee8e;--highlight-ink:#183527;--link:var(--accent)}
 :root[data-palette=ocean] {--accent:#175877;--banner:#123d55;--highlight:#a6e1f5;--highlight-ink:#113448}
 :root[data-palette=plum] {--accent:#723961;--banner:#502d49;--highlight:#f6c6e4;--highlight-ink:#441d36}
-:root[data-mode=dark]{color-scheme:dark;--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}
-@media(prefers-color-scheme:dark){:root:not([data-mode=light]){color-scheme:dark;--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}}
+:root[data-mode=dark]{color-scheme:dark;--wall-shade:rgba(12,18,20,.80);--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}
+@media(prefers-color-scheme:dark){:root:not([data-mode=light]){color-scheme:dark;--wall-shade:rgba(12,18,20,.80);--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}}
 body {background:var(--paper);color:var(--ink)}
 .workspace-tools,.site-footer {max-width:1160px;margin:auto;padding:12px clamp(16px,4vw,52px)}
-.tool-switches,.preferences,.voice-tools,.chat-entry {display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
+.tool-switches,.preferences {display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
 .tool-switches {justify-content:flex-end}
-.workspace-tools button,.workspace-tools select,.chat-entry input {border:1px solid var(--edge);background:var(--surface);color:var(--ink);border-radius:8px;padding:.5rem .8rem}
+.workspace-tools button,.workspace-tools select {border:1px solid var(--edge);background:var(--surface);color:var(--ink);border-radius:8px;padding:.5rem .8rem}
 .workspace-tools button {cursor:pointer}
-.workspace-tools button[aria-expanded=true],.chat-entry button {background:var(--accent);color:white}
+.workspace-tools button[aria-expanded=true] {background:var(--accent);color:white}
 .workspace-tools button:disabled {opacity:.65}
-.preferences,.assistant-panel {border:1px solid var(--edge);background:var(--surface);padding:1rem;margin-top:.7rem;border-radius:12px}
+.preferences {border:1px solid var(--edge);background:var(--surface);padding:1rem;margin-top:.7rem;border-radius:12px}
 .preferences {justify-content:flex-end}
-.preferences label,.voice-tools label {margin:0}
-.assistant-panel {max-width:45rem;margin-left:auto}
-.assistant-panel h2 {font:1.6rem Georgia,serif;color:var(--link)}
-.chat-log {max-height:14rem;overflow:auto;overflow-wrap:anywhere}
-.chat-log p {padding:.6rem;background:var(--soft);border-radius:6px;white-space:pre-wrap}
-.chat-entry input {flex:1;min-width:6rem}
-.voice-tools {margin:.7rem 0}
+.preferences label {margin:0}
 .studio .mast a,.studio-title h1,.tool-page h1,.tool-page legend,.tool-page summary,.resources a,.site-footer a,.tool-page>a {color:var(--link)}
 .wordmark i,.home #classic,.feature {background:var(--banner);color:var(--on-banner)}
 .studio .classic-duration button,.feature button.action {background:var(--highlight);color:var(--highlight-ink);border-color:var(--highlight)}
@@ -177,3 +171,11 @@ body {background:var(--paper);color:var(--ink)}
 .tool-page .text-muted {color:var(--muted)!important}
 .tool-page pre,.tool-page .table {color:var(--ink)}
 .studio .feature .typing-cue {background:rgba(0,0,0,.18);border-color:var(--highlight)}
+
+/* One fixed photograph behind every route, with a mode-aware tint for text. */
+body {isolation:isolate;min-height:100vh}
+body::before {
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(var(--wall-shade,rgba(255,252,244,.38)),var(--wall-shade,rgba(255,252,244,.38))),
+        url('./assets/corner.webp') 76% center / cover no-repeat;
+}
