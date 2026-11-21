@@ -147,8 +147,8 @@ body {background:#f6f7f2;color:var(--ink)}
 :root {--surface:#fff;--soft:#edf1e8;--accent:#205947;--banner:#113d36;--on-banner:#fff;--highlight:#d6ee8e;--highlight-ink:#183527;--link:var(--accent)}
 :root[data-palette=ocean] {--accent:#175877;--banner:#123d55;--highlight:#a6e1f5;--highlight-ink:#113448}
 :root[data-palette=plum] {--accent:#723961;--banner:#502d49;--highlight:#f6c6e4;--highlight-ink:#441d36}
-:root[data-mode=dark]{color-scheme:dark;--wall-shade:rgba(12,18,20,.80);--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}
-@media(prefers-color-scheme:dark){:root:not([data-mode=light]){color-scheme:dark;--wall-shade:rgba(12,18,20,.80);--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}}
+:root[data-mode=dark]{color-scheme:dark;--wall-overlay:linear-gradient(110deg,rgba(13,24,35,.48),rgba(14,25,35,.16));--wall-filter:grayscale(.83) brightness(.38) contrast(1.15);--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}
+@media(prefers-color-scheme:dark){:root:not([data-mode=light]){color-scheme:dark;--wall-overlay:linear-gradient(110deg,rgba(13,24,35,.48),rgba(14,25,35,.16));--wall-filter:grayscale(.83) brightness(.38) contrast(1.15);--paper:#141a1c;--surface:#20292b;--soft:#293536;--ink:#eff5f3;--muted:#c0ceca;--edge:#536364;--link:var(--highlight)}}
 body {background:var(--paper);color:var(--ink)}
 .workspace-tools,.site-footer {max-width:1160px;margin:auto;padding:12px clamp(16px,4vw,52px)}
 .tool-switches,.preferences {display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
@@ -176,6 +176,7 @@ body {background:var(--paper);color:var(--ink)}
 body {isolation:isolate;min-height:100vh}
 body::before {
     content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-    background:linear-gradient(var(--wall-shade,rgba(255,252,244,.38)),var(--wall-shade,rgba(255,252,244,.38))),
+    background:var(--wall-overlay,linear-gradient(rgba(255,252,244,.38),rgba(255,252,244,.38))),
         url('./assets/corner.webp') 76% center / cover no-repeat;
+    filter:var(--wall-filter,none);
 }
