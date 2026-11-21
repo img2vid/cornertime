@@ -28,4 +28,4 @@ Choose **Design preset** to set your own times and spoken phrases. A preset is a
 
 ## Appearance
 
-Open **Appearance** on any screen. System follows the device's light or dark setting. Light and Dark override it. Forest, Ocean, and Plum work in every mode. This browser remembers both choices. All screens share one corner wallpaper. Dark mode dims and desaturates the photograph while keeping controls and text at their normal contrast.
+Open **Appearance** on any screen. System follows the device's light or dark setting. Light and Dark override it. Forest, Ocean, and Plum work in every mode. This browser remembers both choices. All screens use the daylight corner photograph in light mode and a separately rendered evening photograph in dark mode. System mode automatically switches between the two.
